@@ -1,0 +1,18 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.codingchallenge.coinrate</groupId>
+  <artifactId>coinrate</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>Coinrate</name>
+  <description>The project aims to provide localized pricing and historical data for various cryptocurrencies.
+    It consists of independent microservices that work together to fetch and deliver localized cryptocurrency
+    data to users. The architecture allows for scalability, flexibility, and easy integration with other systems.
+  </description>
+
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>locale-service</module>
+  </modules>
+</project>
