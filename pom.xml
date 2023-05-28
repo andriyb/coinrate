@@ -14,5 +14,6 @@
 
   <modules>
     <module>locale-service</module>
+    <module>currency-service</module>
   </modules>
 </project>
