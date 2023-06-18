@@ -1,0 +1,15 @@
+rate-gateway:
+  default-country-code: DE
+  default-lang-code: de
+  default-currency-code: EUR
+
+spring:
+  application:
+    name: rate-gateway
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    enabled: false
