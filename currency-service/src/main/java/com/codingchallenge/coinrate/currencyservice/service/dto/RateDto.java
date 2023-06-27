@@ -1,6 +1,7 @@
 package com.codingchallenge.coinrate.currencyservice.service.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public class RateDto {
 
@@ -14,6 +15,7 @@ public class RateDto {
 
     private BigDecimal currentRate;
 
+    public RateDto() {}
 
     public RateDto(String coinCode, String currencyCode, String coinName, String coinSymbol, BigDecimal currentRate) {
         this.coinCode = coinCode;

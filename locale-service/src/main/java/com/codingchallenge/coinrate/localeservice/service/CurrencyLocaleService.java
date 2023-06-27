@@ -94,11 +94,10 @@ public class CurrencyLocaleService {
             String code = getISOCountryCode(ip);
             currencyLocales.addAll(currencyLocaleRepository.getByCountryCode(code));
 
-
-        CurrencyLocaleDtoMapper mapper = new CurrencyLocaleDtoMapper();
-        currencyLocaleDtoList.addAll(currencyLocales.stream()
-                .map(mapper::mapEntityToDto)
-                .collect(Collectors.toList()));
+            CurrencyLocaleDtoMapper mapper = new CurrencyLocaleDtoMapper();
+            currencyLocaleDtoList.addAll(currencyLocales.stream()
+                    .map(mapper::mapEntityToDto)
+                    .collect(Collectors.toList()));
 
         }catch (IOException | GeoIp2Exception e2) {
         }
@@ -107,7 +106,8 @@ public class CurrencyLocaleService {
         if (currencyLocaleDtoList.isEmpty()) {
             // If no currency locales are found, add a default one
             currencyLocaleDtoList.add(
-                    new CurrencyLocaleDto(defaultCountryCode, defaultLangCode, defaultCurrencyCode, true));
+                    new CurrencyLocaleDto(defaultCountryCode, defaultLangCode, defaultCurrencyCode,
+                            true, true));
         }
 
         return currencyLocaleDtoList;

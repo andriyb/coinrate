@@ -95,8 +95,8 @@ class CurrencyLocaleMyServiceTest {
 
         CurrencyLocaleDtoMapper mapper = mock(CurrencyLocaleDtoMapper.class);
         List<CurrencyLocaleDto> expectedCurrencyLocaleDtos = new ArrayList<>();
-        expectedCurrencyLocaleDtos.add(new CurrencyLocaleDto("US", "en", "USD", true));
-        when(mapper.mapEntityToDto(any(CurrencyLocale.class))).thenReturn(new CurrencyLocaleDto("US", "en", "USD", true));
+        expectedCurrencyLocaleDtos.add(new CurrencyLocaleDto("US", "en", "USD", true, false));
+        when(mapper.mapEntityToDto(any(CurrencyLocale.class))).thenReturn(new CurrencyLocaleDto("US", "en", "USD", true, false));
 
         // Calling the method under test
         List<CurrencyLocaleDto> actualCurrencyLocaleDtos = currencyLocaleService.getCurrencyLocales(ip);

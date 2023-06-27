@@ -30,7 +30,7 @@ public class RateHistory {
     @Column(name = "coinSymbol")
     private String coinSymbol;
 
-    @Column(name = "rate")
+    @Column(name = "rate", columnDefinition = "NUMERIC(30,20)")
     private BigDecimal rate;
 
     public RateHistory() {

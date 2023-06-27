@@ -1,5 +1,7 @@
 package com.codingchallenge.coinrate.rategateway.config;
 
+import com.codingchallenge.coinrate.rategateway.service.dto.CurrencyLocaleDto;
+import com.codingchallenge.coinrate.rategateway.web.dto.LocaleFormDto;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -19,26 +21,18 @@ public class CustomUserDetails implements UserDetails {
     private boolean enabled;
     private Collection<? extends GrantedAuthority> authorities;
 
-    private String selectedCrypto;
-    private String country;
-    private String language;
-    private String currency;
-    private List<String> supportedCoins;
+    private CurrencyLocaleDto currencyLocale;
 
     public CustomUserDetails() {}
 
-    public CustomUserDetails(String username, String password, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled, String selectedCrypto, String country, String language, String currency, List<String> supportedCoins) {
+    public CustomUserDetails(String username, String password, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled, CurrencyLocaleDto currencyLocale) {
         this.username = username;
         this.password = password;
         this.accountNonExpired = accountNonExpired;
         this.accountNonLocked = accountNonLocked;
         this.credentialsNonExpired = credentialsNonExpired;
         this.enabled = enabled;
-        this.selectedCrypto = selectedCrypto;
-        this.country = country;
-        this.language = language;
-        this.currency = currency;
-        this.supportedCoins = supportedCoins;
+        this.currencyLocale = currencyLocale;
     }
 
     @Override
@@ -104,94 +98,11 @@ public class CustomUserDetails implements UserDetails {
         this.authorities = authorities;
     }
 
-    /**
-     * Gets the selected cryptocurrency.
-     *
-     * @return The selected cryptocurrency.
-     */
-    public String getSelectedCrypto() {
-        return selectedCrypto;
+    public CurrencyLocaleDto getCurrencyLocale() {
+        return currencyLocale;
     }
 
-    /**
-     * Sets the selected cryptocurrency.
-     *
-     * @param selectedCrypto The selected cryptocurrency.
-     */
-    public void setSelectedCrypto(String selectedCrypto) {
-        this.selectedCrypto = selectedCrypto;
+    public void setCurrencyLocale(CurrencyLocaleDto currencyLocale) {
+        this.currencyLocale = currencyLocale;
     }
-
-    /**
-     * Gets the Country.
-     *
-     * @return The Country.
-     */
-    public String getCountry() {
-        return country;
-    }
-
-    /**
-     * Sets the Country.
-     *
-     * @param country The Country.
-     */
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    /**
-     * Gets the Language.
-     *
-     * @return The Language.
-     */
-    public String getLanguage() {
-        return language;
-    }
-
-    /**
-     * Sets the Language.
-     *
-     * @param language The Language.
-     */
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    /**
-     * Gets the Currency.
-     *
-     * @return The Currency.
-     */
-    public String getCurrency() {
-        return currency;
-    }
-
-    /**
-     * Sets the Currency.
-     *
-     * @param currency The Currency.
-     */
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    /**
-     * Gets the supported coins.
-     *
-     * @return The supported coins.
-     */
-    public List<String> getSupportedCoins() {
-        return supportedCoins;
-    }
-
-    /**
-     * Sets the supported coins.
-     *
-     * @param supportedCoins The supported coins.
-     */
-    public void setSupportedCoins(List<String> supportedCoins) {
-        this.supportedCoins = supportedCoins;
-    }
-
 }

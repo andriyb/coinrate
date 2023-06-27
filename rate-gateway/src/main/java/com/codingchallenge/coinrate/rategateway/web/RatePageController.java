@@ -2,11 +2,11 @@ package com.codingchallenge.coinrate.rategateway.web;
 
 import com.codingchallenge.coinrate.rategateway.config.CustomUserDetails;
 import com.codingchallenge.coinrate.rategateway.service.RateService;
-import com.codingchallenge.coinrate.rategateway.service.dto.CurrencyLocaleDto;
-import com.codingchallenge.coinrate.rategateway.service.dto.HistoryRateDto;
-import com.codingchallenge.coinrate.rategateway.web.dto.CoinRatesFormDTO;
-import com.codingchallenge.coinrate.rategateway.web.dto.CurrentRateDto;
-import com.codingchallenge.coinrate.rategateway.web.dto.LocaleDto;
+import com.codingchallenge.coinrate.rategateway.service.dto.*;
+import com.codingchallenge.coinrate.rategateway.web.dto.*;
+import com.codingchallenge.coinrate.rategateway.web.mapper.CurrentRateFormDtoMapper;
+import com.codingchallenge.coinrate.rategateway.web.mapper.HistoryRateFormDtoMapper;
+import com.codingchallenge.coinrate.rategateway.web.mapper.LocaleFormDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import java.util.stream.Collectors;
 
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import java.math.BigDecimal;
 
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.stream.IntStream;
 
 /**
  * Controller class for handling rate-related pages and requests.
@@ -51,11 +53,7 @@ public class RatePageController {
     @GetMapping(path = { "/index", "/" })
     public String index(Model model, HttpServletRequest request) {
 
-        CoinRatesFormDTO coinRatesData = loadAllFormData(new CoinRatesFormDTO());
-        coinRatesData.setIpAddress(parseRequestIpAddress(request));
-
-        model.addAttribute("coinRatesData", coinRatesData);
-
+        model.addAttribute("pageForm", createPageFormDto(request));
         return "index";
     }
 
@@ -71,18 +69,17 @@ public class RatePageController {
     }
 
     /**
-     * Handles the POST request for retrieving rate with history.
+     * Handles the POST coin change request.
      *
-     * @param formData  The CoinRatesFormDTO object containing form data.
-     * @return A ResponseEntity containing the CoinRatesFormDTO object.
+     * @param changeCoinRequestDto The ChangeCoinRequestDto object containing form data.
+     * @return A ResponseEntity containing the ChangeCoinResponseDto object.
      */
-    @PostMapping(path = { "/rate-with-history", }, consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Object> getRateWithHistory(@RequestBody CoinRatesFormDTO formData) {
+    @PostMapping(path = { "/change-coin", }, consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Object> changeCoin(@RequestBody ChangeCoinRequestDto changeCoinRequestDto) {
 
-        CoinRatesFormDTO coinRatesData = loadAllFormData(formData);
-
-        // Return the response with the appropriate status code
-        return ResponseEntity.ok(coinRatesData);
+        ChangeCoinResponseDto responseDto = createChangeCoinResponseDto(changeCoinRequestDto.getCoinCode(),
+                changeCoinRequestDto.getDaysCount());
+        return ResponseEntity.ok(responseDto);
     }
 
     /**
@@ -99,7 +96,50 @@ public class RatePageController {
         return ResponseEntity.ok(ipAddress);
     }
 
+    /**
+     * Handles the POST IP change request.
+     *
+     * @param changeIpRequestDto The ChangeIpRequestDto object containing form data.
+     * @return A ResponseEntity containing the ChangeCoinResponseDto object.
+     */
+    @PostMapping(path = { "/change-ip", }, consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Object> changeIp(@RequestBody ChangeIpRequestDto changeIpRequestDto) {
 
+        ChangeIpResponseDto responseDto = createChangeIpResponseDto(changeIpRequestDto.getCoinCode(),
+                changeIpRequestDto.getDaysCount(), changeIpRequestDto.getIpAddress());
+        return ResponseEntity.ok(responseDto);
+    }
+
+    /**
+     * Handles the POST update coin rate request.
+     *
+     * @param currentRateRequestDto The UpdateCurrentRateRequestDto object containing form data.
+     * @return A ResponseEntity containing the UpdateCurrentRateResponseDto object.
+     */
+    @PostMapping(path = { "/update-current-rate", }, consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Object> updateCurrentRate(@RequestBody UpdateCurrentRateRequestDto currentRateRequestDto) {
+
+        CurrentRateFormDto currentRateForm =
+                createUpdateCurrentRateResponseDto(currentRateRequestDto.getCoinCode());
+
+        return ResponseEntity.ok(currentRateForm);
+    }
+
+
+    /**
+     * Handles the POST update history rates request.
+     *
+     * @param changeCoinRequestDto The ChangeCoinRequestDto object containing form data.
+     * @return A ResponseEntity containing the List of HistoryRateFormDto.
+     */
+    @PostMapping(path = { "/change-days-count", }, consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Object> changeDaysCount(@RequestBody ChangeCoinRequestDto changeCoinRequestDto) {
+
+        List<HistoryRateFormDto> responseDtoList =
+                createHistoryRateFormDtoList(changeCoinRequestDto.getCoinCode(), changeCoinRequestDto.getDaysCount());
+
+        return ResponseEntity.ok(responseDtoList);
+    }
 
     /**
      * Parses the IP address from the given HttpServletRequest object.
@@ -123,87 +163,133 @@ public class RatePageController {
         return ipAddress;
     }
 
-    /**
-     * Loads the CoinRatesFormDTO object with initial data.
-     *
-     * @param formData  The CoinRatesFormDTO object to load data into.
-     * @return The loaded CoinRatesFormDTO object.
-     */
-    protected CoinRatesFormDTO loadAllFormData(CoinRatesFormDTO formData) {
 
-        Date updateTime = new Date();
+    private void saveUserLocaleToSession(CurrencyLocaleDto currencyLocale) {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         CustomUserDetails userDetails = (CustomUserDetails) principal;
+        userDetails.setCurrencyLocale(currencyLocale);
 
-        // Get the currency locale information based on the user's IP address
-        List<CurrencyLocaleDto> currencyLocaleDto = rateService.getLocales(formData.getIpAddress());
+    }
 
-        // Extract the language code, country code, and currency code from the currency locale information
-        String langCode = currencyLocaleDto.get(0).getLangCode();
-        String countryCode = currencyLocaleDto.get(0).getCountryCode();
-        String currencyCode = currencyLocaleDto.get(0).getCurrencyCode();
+    private CurrencyLocaleDto loadUserLocaleFromSession() {
 
-        // Create a Locale object based on the extracted language code and country code
-        Locale currentLocale = new Locale(langCode, countryCode);
-        // Get the display name of the currency based on the currency code
-        String currentCurrency = Currency.getInstance(currencyCode).getDisplayName();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) principal;
+        return userDetails.getCurrencyLocale();
+    }
 
-        // Set the default cryptocurrency code to "bitcoin"
-        String coinCode = "bitcoin";
-        if(formData.getSelectedCoin() != null) {
-            // If a cryptocurrency is selected in the form, update the coinCode
-            coinCode = formData.getSelectedCoin();
-        }
+
+    private ChangeCoinResponseDto createChangeCoinResponseDto(String coinCode, Integer daysCount) {
+
+        CurrencyLocaleDto currencyLocale = loadUserLocaleFromSession();
+        Locale locale = new Locale(currencyLocale.getLangCode(), currencyLocale.getCountryCode());
 
         // Get the current rate for the selected cryptocurrency and currency code
-        BigDecimal currentRate = rateService.getCurrentRate(coinCode, currencyCode.toLowerCase()).getCurrentRate();
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(currentLocale);
-        String formattedRate = currencyFormat.format(currentRate);
+        CurrentRateDto rate = rateService.getCurrentRate(coinCode, currencyLocale.getCurrencyCode());
+        CurrentRateFormDto rateForm = CurrentRateFormDtoMapper.mapClientToFormDto(rate, locale);
+
+        // Get the history rates for the selected cryptocurrency and currency code
+        List<HistoryRateDto> historyRates = rateService.getRateHistory(coinCode,
+                currencyLocale.getCurrencyCode(), daysCount);
+
+        List<HistoryRateFormDto> historyRatesForm = HistoryRateFormDtoMapper.mapClientToFormDto(historyRates, locale);
+
+        return new ChangeCoinResponseDto(rateForm, historyRatesForm);
+    }
+
+    private ChangeIpResponseDto createChangeIpResponseDto(String coinCode, Integer daysCount, String ipAddress) {
+
+        // Get the currency locale information based on the user's IP address
+        List<CurrencyLocaleDto> currencyLocaleDto = rateService.getLocales(ipAddress);
+        // The first currency locale used as default currency locale for the country
+        CurrencyLocaleDto currencyLocale = currencyLocaleDto.get(0);
+        saveUserLocaleToSession(currencyLocale);
+
+        Locale locale = new Locale(currencyLocale.getLangCode().toLowerCase(),
+                currencyLocale.getCountryCode().toUpperCase());
+        LocaleFormDto localeForm = LocaleFormDtoMapper.mapClientToFormDto(currencyLocale, locale);
+
+        // Get the current rate for the selected cryptocurrency and currency code
+        CurrentRateDto rate = rateService.getCurrentRate(coinCode, currencyLocale.getCurrencyCode());
+        CurrentRateFormDto rateForm = CurrentRateFormDtoMapper.mapClientToFormDto(rate, locale);
+
+        // Get the history rates for the selected cryptocurrency and currency code
+        List<HistoryRateDto> historyRates = rateService.getRateHistory(coinCode,
+                currencyLocale.getCurrencyCode(), daysCount);
+
+        List<HistoryRateFormDto> historyRatesForm = HistoryRateFormDtoMapper.mapClientToFormDto(historyRates, locale);
+
+        return new ChangeIpResponseDto(rateForm, historyRatesForm, localeForm);
+    }
+
+    private CurrentRateFormDto createUpdateCurrentRateResponseDto(
+            String coinCode) {
+
+        CurrencyLocaleDto currencyLocale = loadUserLocaleFromSession();
+        Locale locale = new Locale(currencyLocale.getLangCode(), currencyLocale.getCountryCode());
+
+        // Get the current rate for the selected cryptocurrency and currency code
+        CurrentRateDto rate = rateService.getCurrentRate(coinCode, currencyLocale.getCurrencyCode());
+        CurrentRateFormDto rateForm = CurrentRateFormDtoMapper.mapClientToFormDto(rate, locale);
+
+        return rateForm;
+    }
 
 
-        if (userDetails.getSelectedCrypto() == null) {
+    private List<HistoryRateFormDto> createHistoryRateFormDtoList(
+            String coinCode, Integer daysCount) {
 
-            //Get the list of supported coins
-            List<String> supportedCoinsList = rateService.getSupportedCoins();
+        CurrencyLocaleDto currencyLocale = loadUserLocaleFromSession();
+        Locale locale = new Locale(currencyLocale.getLangCode(), currencyLocale.getCountryCode());
 
-            // Set default values for userDetails if userDetails data has not been initialized
-            userDetails.setSelectedCrypto(coinCode);
-            userDetails.setCountry(currentLocale.getDisplayCountry());
-            userDetails.setLanguage(currentLocale.getDisplayLanguage());
-            userDetails.setCurrency(currentCurrency);
-            userDetails.setSupportedCoins(supportedCoinsList);
-        }
+        // Get the history rates for the selected cryptocurrency and currency code
+        List<HistoryRateDto> historyRates = rateService.getRateHistory(coinCode,
+                currencyLocale.getCurrencyCode(), daysCount);
 
-        // Check if any of the form data fields differ from the userDetails
-        if (!userDetails.getSelectedCrypto().equals(formData.getSelectedCoin()) ||
-            !userDetails.getCountry().equals(currentLocale.getDisplayCountry()) ||
-            !userDetails.getLanguage().equals(currentLocale.getDisplayLanguage()) ||
-            !userDetails.getCurrency().equals(currentCurrency)) {
+        List<HistoryRateFormDto> historyRatesForm = HistoryRateFormDtoMapper.mapClientToFormDto(historyRates, locale);
 
-            // Update userDetails if any of the form data fields differ from userDetails
-            userDetails.setSelectedCrypto(coinCode);
-            userDetails.setCountry(currentLocale.getDisplayCountry());
-            userDetails.setLanguage(currentLocale.getDisplayLanguage());
-            userDetails.setCurrency(currentCurrency);
+        return historyRatesForm;
+    }
 
-            // Get the history rates for the selected cryptocurrency and currency code
-            List<HistoryRateDto> historyRates = rateService.getRateHistory(userDetails.getSelectedCrypto(), currencyCode.toLowerCase(), 7);
 
-            // Return CoinRatesFormDTO with updated values
-            return new CoinRatesFormDTO(userDetails.getSupportedCoins(), "","", historyRates,
-                    new CurrentRateDto(formattedRate, "" + updateTime),
-                            new LocaleDto(currentLocale.getDisplayCountry(), currentLocale.getDisplayLanguage(), currentCurrency));
+    /**
+     * Creates the RatePageFormDto object with initial data.
+     *
+     * @param request  The HttpServletRequest object to read IP address.
+     * @return The RatePageFormDto object.
+     */
+    private RateFormDto createPageFormDto(HttpServletRequest request) {
 
-        } else {
+        List<String> supportedCoinsList = rateService.getSupportedCoins();
+        String selectedCoin = supportedCoinsList.get(0);
+        String ipAddress = parseRequestIpAddress(request);
 
-            // Return CoinRatesFormDTO with the original form data
-            return new CoinRatesFormDTO(userDetails.getSupportedCoins(),"", "", formData.getHistoryRates(),
-                    new CurrentRateDto(formattedRate, "" + updateTime),
-                    new LocaleDto(formData.getLocale().getLanguage(), formData.getLocale().getCountry(), formData.getLocale().getCurrency()));
+        // Get the currency locale information based on the user's IP address
+        List<CurrencyLocaleDto> currencyLocaleDto = rateService.getLocales(ipAddress);
+        // The first currency locale used as default currency locale for the country
+        CurrencyLocaleDto currencyLocale = currencyLocaleDto.get(0);
 
-        }
 
+        Locale locale = new Locale(currencyLocale.getLangCode().toLowerCase(),
+                currencyLocale.getCountryCode().toUpperCase());
+        LocaleFormDto localeForm = LocaleFormDtoMapper.mapClientToFormDto(currencyLocale, locale);
+
+        HistorySettingsDto historySettings = rateService.getHistorySettings();
+
+        FormRateDto formRate =  rateService.getFormRate(selectedCoin, currencyLocale.getCurrencyCode().toLowerCase(),
+                historySettings.getHistoryDaysCountDefault());
+
+        CurrentRateFormDto currentRateForm = CurrentRateFormDtoMapper.mapClientToFormDto(formRate, locale);
+
+        List<HistoryRateFormDto> historyRatesFormList =
+                HistoryRateFormDtoMapper.mapClientToFormDto(formRate.getHistory(), locale);
+
+
+        saveUserLocaleToSession(currencyLocale);
+
+        return new RateFormDto(supportedCoinsList, selectedCoin, ipAddress, localeForm, currentRateForm,
+                historyRatesFormList, historySettings);
     }
 
 }

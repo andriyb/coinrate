@@ -3,6 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
@@ -18,18 +19,50 @@
         }
 
         .label-min-width {
-            min-width: 180px; /* Adjust the width value as needed */
+            min-width: 220px;
+        }
+
+        #history-table td:first-child {
+            min-width: 120px;
         }
     </style>
-
-
-    <script th:inline="javascript" src="https://unpkg.com/htmx.org@1.9.2"></script>
 
     <title>Welcome to Coinrate</title>
 
     <script th:inline="javascript">
 
-        function sendDetectIPHtmxRequest() {
+        function runAtMidnight() {
+            // Your code here
+            //console.log("Running at midnight (UTC)");
+        }
+
+        function scheduleMidnightTask() {
+            // Get the current UTC date
+            let currentDate = new Date();
+
+            // Calculate the time until the next UTC midnight
+            let timeUntilMidnight = new Date(
+                currentDate.getUTCFullYear(),
+                currentDate.getUTCMonth(),
+                currentDate.getUTCDate() + 1, // Tomorrow
+                0, // Hours
+                30, // Minutes
+                0 // Seconds
+            ) - currentDate;
+
+            // Set up the interval to run at midnight (UTC)
+            setTimeout(function () {
+                runAtMidnight();
+                // Schedule the next midnight task (UTC)
+                scheduleMidnightTask();
+            }, timeUntilMidnight);
+        }
+
+        // Call the function to start scheduling the task
+        scheduleMidnightTask();
+
+
+        function sendDetectIpRequest() {
 
             let xhr = new XMLHttpRequest();
             xhr.open("POST", "/detect-ip", true);
@@ -46,68 +79,172 @@
         }
 
 
+        function sendChangeCoinRequest() {
 
-        let historyRates = [[${coinRatesData.historyRates}]];
+            let params = {
+                coinCode: document.getElementById("coins-dropdown").value,
+                daysCount: document.getElementById("input-days-count").value
 
-        function sendHtmxRequest() {
-            //var jwtToken = /*[[${token}]]*/ 'default';
-            //var formData = /*[[${formData}]]*/ 'default';
-            let resForm = {
-                dropdown: document.getElementById("coins-dropdown").value,
-                ipAddress: document.getElementById("ip-address-input").value,
-                country: document.getElementById("country-input").value,
-                language: document.getElementById("language-input").value,
-                currency: document.getElementById("currency-input").value,
-                currentRate: document.getElementById("current-rate-input").value,
-                historyRates: historyRates
-                //token: formData.token
             };
 
             let xhr = new XMLHttpRequest();
-            xhr.open("POST", "/rate-with-history", true);
-            // xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+            xhr.open("POST", "/change-coin", true);
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.onload = function () {
                 if (xhr.status === 200) {
+
                     let response = JSON.parse(xhr.responseText);
-                    // Populate the HTML page with the received content
-                    //document.getElementById("page-content").innerHTML = response;
+                    document.getElementById("current-rate-input").value = response.rateForm.displayRate;
+                    document.getElementById("update-time-input").value = response.rateForm.displayUpdateDateTime;
+
+
                     let tbodyElement = document.getElementById('history-table-body');
                     tbodyElement.innerHTML = '';
+                    let historyRates = response.historyRatesForm;
 
-                    document.getElementById("current-rate-input").value = response.currentRate;
-                    document.getElementById("update-time-input").value = response.updateTime;
-                    document.getElementById("country-input").value = response.country;
-                    document.getElementById("language-input").value = response.language;
-                    document.getElementById("currency-input").value = response.currency;
-
-                    historyRates = response.historyRates;
-
-                    for (let i = 0; i < response.historyRates.length; i++) {
+                    for (let i = 0; i < historyRates.length; i++) {
                         let newRow = document.createElement('tr');
 
-                        let dateCell = document.createElement('td');
-                        dateCell.textContent = response.historyRates[i].rateDate;
-                        newRow.appendChild(dateCell);
-
                         let valueCell = document.createElement('td');
-                        valueCell.textContent = response.historyRates[i].currentRate;
+                        valueCell.textContent = historyRates[i].displayRate;
                         newRow.appendChild(valueCell);
+
+                        let dateCell = document.createElement('td');
+                        dateCell.textContent = historyRates[i].displayRateDate;
+                        newRow.appendChild(dateCell);
 
                         tbodyElement.appendChild(newRow);
                     }
+
 
                 } else {
                     // Handle error cases
                     console.log("Error: " + xhr.status);
                 }
             };
-            xhr.send(JSON.stringify(resForm));
+            xhr.send(JSON.stringify(params));
         }
 
-        window.onload = function () {
-            let form = document.getElementById('coin-rates-form');
-            form.addEventListener('submit', sendHtmxRequest);
+        function sendChangeIpRequest() {
+
+            let params = {
+                coinCode: document.getElementById("coins-dropdown").value,
+                daysCount: document.getElementById("input-days-count").value,
+                ipAddress: document.getElementById("ip-address-input").value
+            };
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "/change-ip", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onload = function () {
+
+                if (xhr.status === 200) {
+
+                    let response = JSON.parse(xhr.responseText);
+
+                    let localeForm = response.localeForm;
+
+                    document.getElementById("country-input").value = localeForm.country;
+                    document.getElementById("currency-input").value = localeForm.currency;
+                    if (localeForm.localeNotFound) {
+                        document.getElementById("ip-status-input").value = "IP Address is not found, using default settings.";
+                    } else {
+                        document.getElementById("ip-status-input").value = "Locale detected successfully.";
+                    }
+
+                    document.getElementById("current-rate-input").value = response.rateForm.displayRate;
+                    document.getElementById("update-time-input").value = response.rateForm.displayUpdateDateTime;
+
+
+                    let tbodyElement = document.getElementById('history-table-body');
+                    tbodyElement.innerHTML = '';
+                    let historyRates = response.historyRatesForm;
+
+                    for (let i = 0; i < historyRates.length; i++) {
+                        let newRow = document.createElement('tr');
+
+                        let valueCell = document.createElement('td');
+                        valueCell.textContent = historyRates[i].displayRate;
+                        newRow.appendChild(valueCell);
+
+                        let dateCell = document.createElement('td');
+                        dateCell.textContent = historyRates[i].displayRateDate;
+                        newRow.appendChild(dateCell);
+
+                        tbodyElement.appendChild(newRow);
+                    }
+
+
+                } else {
+                    // Handle error cases
+                    console.log("Error: " + xhr.status);
+                }
+            };
+            xhr.send(JSON.stringify(params));
+        }
+
+        function sendUpdateCurrentRateRequest() {
+
+            let params = {
+                coinCode: document.getElementById("coins-dropdown").value,
+                daysCount: document.getElementById("input-days-count").value
+            };
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "/update-current-rate", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    let response = JSON.parse(xhr.responseText);
+                    document.getElementById("current-rate-input").value = response.displayRate;
+                    document.getElementById("update-time-input").value = response.displayUpdateDateTime;
+                } else {
+                    // Handle error cases
+                    console.log("Error: " + xhr.status);
+                }
+            };
+            xhr.send(JSON.stringify(params));
+        }
+
+        function sendChangeDaysCountRequest() {
+
+            let params = {
+                coinCode: document.getElementById("coins-dropdown").value,
+                daysCount: document.getElementById("input-days-count").value
+            };
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "/change-days-count", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+
+                    let response = JSON.parse(xhr.responseText);
+
+                    let tbodyElement = document.getElementById('history-table-body');
+                    tbodyElement.innerHTML = '';
+                    let historyRates = response;
+
+                    for (let i = 0; i < historyRates.length; i++) {
+                        let newRow = document.createElement('tr');
+
+                        let valueCell = document.createElement('td');
+                        valueCell.textContent = historyRates[i].displayRate;
+                        newRow.appendChild(valueCell);
+
+                        let dateCell = document.createElement('td');
+                        dateCell.textContent = historyRates[i].displayRateDate;
+                        newRow.appendChild(dateCell);
+
+                        tbodyElement.appendChild(newRow);
+                    }
+                } else {
+                    // Handle error cases
+                    console.log("Error: " + xhr.status);
+                }
+            };
+            xhr.send(JSON.stringify(params));
         }
 
     </script>
@@ -135,16 +272,16 @@
             <div class="container d-flex justify-content-center align-items-center">
                 <div class="border border-secondary p-3 rounded">
 
-                    <form id="coin-rates-form" th:object="${coinRatesData}">
-                        <input type="hidden" name="token" th:value="${coinRatesData.token}"/>
+                    <form id="coin-rates-form" th:object="${pageForm}">
+                        <input type="hidden" name="token" th:value="${pageForm.token}"/>
                         <div class="input-group mb-2">
                             <div class="input-group-prepend">
-                                <label class="input-group-text label-min-width" for="coins-dropdown">Crypto:</label>
+                                <label class="input-group-text label-min-width" for="coins-dropdown">Crypto Currency:</label>
                             </div>
 
                             <select id="coins-dropdown" name="coins-dropdown" class="selectpicker form-control" data-live-search="true"
-                                    th:field="${coinRatesData.selectedCoin}" required>
-                                <option th:each="option : ${coinRatesData.availableCoins}" th:value="${option}"
+                                    th:field="${pageForm.selectedCoin}" onchange="sendChangeCoinRequest();" required>
+                                <option th:each="option : ${pageForm.supportedCoins}" th:value="${option}"
                                         th:text="${option}"></option>
                             </select>
 
@@ -159,84 +296,84 @@
                                    pattern="^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^((([0-9a-fA-F]{1,4}:){0,5})?([0-9a-fA-F]{1,4})?::(([0-9a-fA-F]{1,4}:){0,5})?[0-9a-fA-F]{1,4})$|^((([0-9]{1,3}\.){3}[0-9]{1,3}))$"
                                    th:field="*{ipAddress}" required >
                             <span class="input-group-btn">
-                                <button class="btn border border-secondary" onclick="sendDetectIPHtmxRequest(); return false;">Detect</button>
-                                <button class="btn border border-secondary" onclick="sendHtmxRequest(); return false;">Apply</button>
+                                <button class="btn border border-secondary" type="button" onclick="sendDetectIpRequest();">Detect</button>
+                                <button class="btn border border-secondary" type="button" onclick="sendChangeIpRequest();">Apply</button>
                             </span>
                         </div>
                         <div class="input-group mb-2">
                             <div class="input-group-prepend">
-                                <label class="input-group-text label-min-width" for="country-input">Country</label>
+                                <label class="input-group-text label-min-width" for="country-input">Locale settings status</label>
+                            </div>
+
+                            <input id="ip-status-input" type="text" class="form-control"
+                                   th:value ="${pageForm.locale.localeNotFound} ? 'IP Address is not found, using default settings.' : 'Locale detected successfully.'" readonly>
+
+                        </div>
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text label-min-width" for="country-input">Country By IP</label>
                             </div>
 
                             <input id="country-input" type="text" class="form-control"
-                                   th:field="${coinRatesData.country}" readonly>
+                                   th:field="${pageForm.locale.country}" readonly>
 
                         </div>
                         <div class="input-group mb-2">
                             <div class="input-group-prepend">
-                                <label class="input-group-text label-min-width" for="language-input">Language</label>
-                            </div>
-
-                            <input id="language-input" type="text" class="form-control"
-                                   th:field="${coinRatesData.language}" readonly>
-
-                        </div>
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text label-min-width" for="currency-input">Currency</label>
+                                <label class="input-group-text label-min-width" for="currency-input">Local Currency</label>
                             </div>
 
                             <input id="currency-input" type="text" class="form-control"
-                                   th:field="${coinRatesData.currency}" readonly>
+                                   th:field="${pageForm.locale.currency}" readonly>
 
                         </div>
                         <div class="input-group mb-2">
                             <div class="input-group-prepend">
-                                <label class="input-group-text label-min-width" for="current-rate-input">Current rate</label>
+                                <label class="input-group-text label-min-width" for="current-rate-input">Current Rate</label>
                             </div>
 
                             <input id="current-rate-input" type="text" class="form-control"
-                                   th:field="${coinRatesData.currentRate}" readonly>
+                                   th:field="${pageForm.currentRate.displayRate}" readonly>
 
                             <span class="input-group-btn">
-                                <button class="btn border border-secondary" onclick="sendHtmxRequest(); return false;">Update</button>
+                                <button class="btn border border-secondary" type="button" onclick="sendUpdateCurrentRateRequest();">Update</button>
                             </span>
 
                         </div>
                         <div class="input-group mb-2">
                             <div class="input-group-prepend">
-                                <label class="input-group-text label-min-width" for="update-time-input">Update time</label>
+                                <label class="input-group-text label-min-width" for="update-time-input">Current Rate Update Time</label>
                             </div>
 
                             <input id="update-time-input" type="text" class="form-control"
-                                   th:field="${coinRatesData.updateTime}" readonly>
+                                   th:field="${pageForm.currentRate.displayUpdateDateTime}" readonly>
+
+                        </div>
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text label-min-width" for="current-rate-input">Rates History Length</label>
+                            </div>
+
+                            <select class="form-select" id="input-days-count" onchange="sendChangeDaysCountRequest();">
+                                <option th:each="i : ${#numbers.sequence(1, pageForm.historySettings.historyDaysCountLimit)}" th:value="${i}" th:text="${i} + ' Day' + (${i>1}? 's':'') "
+                                        th:selected="${i==pageForm.historySettings.historyDaysCountDefault}"></option>
+                            </select>
+
+
 
                         </div>
                         <br/>
                     </form>
 
-                    <button onclick="sendHtmxRequest()">Refresh</button>
-
-
-                        <div class="row">
-                            <div class="col text-start">
-                                <label for="history-table" class="small-label-style">Rates History:</label>
-                            </div>
-                        </div>
                         <div class="row">
                             <div class="col">
 
                                 <table id="history-table" class="table table-bordered table-striped table-hover">
-                                    <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Rate</th>
-                                    </tr>
-                                    </thead>
+
                                     <tbody id="history-table-body">
-                                    <tr th:each="data : ${coinRatesData.historyRates}">
-                                        <td th:text="${data.rateDate}"></td>
-                                        <td th:text="${data.currentRate}"></td>
+                                    <tr th:each="data : ${pageForm.historyRates}">
+                                        <td th:text="${data.displayRate}"></td>
+                                        <td th:text="${data.displayRateDate}"></td>
                                     </tr>
                                     </tbody>
                                 </table>

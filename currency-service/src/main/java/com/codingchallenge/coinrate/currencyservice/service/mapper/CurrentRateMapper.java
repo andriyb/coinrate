@@ -9,26 +9,20 @@ import java.util.Map;
 
 public class CurrentRateMapper {
 
-    public static CurrentRateDto toDto(HistoryCoin historyCoin, LocalDateTime currentDateTime) {
+    public static CurrentRateDto toDto(HistoryCoin historyCoin, String currencyCode, LocalDateTime currentDateTime) {
 
         if (historyCoin != null && historyCoin.getMarketData() != null) {
-
             Map<String, BigDecimal> currentPrice =  historyCoin.getMarketData().getCurrentPrice();
-
             if (currentPrice != null && currentPrice.size() > 0) {
-
-                Map.Entry<String, BigDecimal> currentPriceMap =
-                        currentPrice.entrySet().iterator().next();
-
+                BigDecimal rateValue = currentPrice.get(currencyCode);
                 return new CurrentRateDto(
                         historyCoin.getCode(),
-                        currentPriceMap.getKey(),
+                        currencyCode,
                         historyCoin.getSymbol(),
                         historyCoin.getName(),
-                        currentPriceMap.getValue(),
+                        rateValue,
                         currentDateTime);
             }
-
         }
         return null;
     }

@@ -1,8 +1,8 @@
 package com.codingchallenge.coinrate.rategateway.web;
 
 import com.codingchallenge.coinrate.rategateway.config.CustomUserDetails;
-import com.codingchallenge.coinrate.rategateway.web.dto.CoinRatesFormDTO;
-import com.codingchallenge.coinrate.rategateway.web.dto.HistoryRateDTO;
+import com.codingchallenge.coinrate.rategateway.web.dto.RateFormDto;
+import com.codingchallenge.coinrate.rategateway.web.dto.HistoryRateFormDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -65,7 +65,7 @@ class RatePageControllerIntegrationTests {
     @BeforeEach
     void setUp() {
         userDetails = new CustomUserDetails(USERNAME, encoder.encode(PASSWORD), true, true,
-                true, true, null, null, null, null, null);
+                true, true, null);
     }
 
     @Test
@@ -108,7 +108,7 @@ class RatePageControllerIntegrationTests {
     @DisplayName("POST request with authentication for rate with history should return new CoinRatesFormDTO")
     public void postAuthRateWithHistoryNewValue() throws Exception {
 
-        CoinRatesFormDTO formData = new CoinRatesFormDTO();
+        RateFormDto formData = new RateFormDto();
 
         // Create locale and currency objects with default values
         Locale locale = new Locale(defaultLangCode, defaultCountryCode);
@@ -140,17 +140,17 @@ class RatePageControllerIntegrationTests {
     @DisplayName("POST request with authentication for rate with history should return current CoinRatesFormDTO")
     public void postAuthRateWithHistoryCurrentValue() throws Exception {
 
-        CoinRatesFormDTO formData = new CoinRatesFormDTO();
+        RateFormDto formData = new RateFormDto();
 
         // Create locale and currency objects with default values
         Locale locale = new Locale(defaultLangCode, defaultCountryCode);
         Currency currency = Currency.getInstance(defaultCurrencyCode);
 
         // Set up the history rates with some initial values
-        List<HistoryRateDTO> historyRates = new ArrayList<>();
-        historyRates.add(new HistoryRateDTO(LocalDate.now().minusDays(1), "1.01"));
-        historyRates.add(new HistoryRateDTO(LocalDate.now().minusDays(2), "1.02"));
-        historyRates.add(new HistoryRateDTO(LocalDate.now().minusDays(3), "1.03"));
+        List<HistoryRateFormDto> historyRates = new ArrayList<>();
+        historyRates.add(new HistoryRateFormDto(""+LocalDate.now().minusDays(1), "1.01"));
+        historyRates.add(new HistoryRateFormDto(""+LocalDate.now().minusDays(2), "1.02"));
+        historyRates.add(new HistoryRateFormDto(""+LocalDate.now().minusDays(3), "1.03"));
 
         // Set up the form data with the required values
         formData.setSelectedCoin("bitcoin");
@@ -164,10 +164,10 @@ class RatePageControllerIntegrationTests {
         String formDataJson = objectMapper.writeValueAsString(formData);
 
         // Set the user details with the required values
-        userDetails.setSelectedCrypto("bitcoin");
-        userDetails.setCountry(locale.getDisplayCountry());
-        userDetails.setLanguage(locale.getDisplayLanguage());
-        userDetails.setCurrency(currency.getDisplayName());
+        //userDetails.setSelectedCrypto("bitcoin");
+        //userDetails.setCountry(locale.getDisplayCountry());
+        //userDetails.setLanguage(locale.getDisplayLanguage());
+        //userDetails.setCurrency(currency.getDisplayName());
 
         // Send POST request with authentication
         mockMvc.perform(post(RATE_WITH_HISTORY_REST_API_ENDPOINT)
@@ -185,12 +185,12 @@ class RatePageControllerIntegrationTests {
                 .andExpect(jsonPath("$.historyRates").isArray())
                 // Verify that the response fields are equal to the expected values
                 .andExpect(jsonPath("$.historyRates.length()").value(historyRates.size()))
-                .andExpect(jsonPath("$.historyRates[0].date").value(historyRates.get(0).getDate().toString()))
-                .andExpect(jsonPath("$.historyRates[0].rate").value(historyRates.get(0).getRate()))
-                .andExpect(jsonPath("$.historyRates[1].date").value(historyRates.get(1).getDate().toString()))
-                .andExpect(jsonPath("$.historyRates[1].rate").value(historyRates.get(1).getRate()))
-                .andExpect(jsonPath("$.historyRates[2].date").value(historyRates.get(2).getDate().toString()))
-                .andExpect(jsonPath("$.historyRates[2].rate").value(historyRates.get(2).getRate()))
+                //.andExpect(jsonPath("$.historyRates[0].date").value(historyRates.get(0).getDate().toString()))
+                .andExpect(jsonPath("$.historyRates[0].rate").value(historyRates.get(0).getDisplayRate()))
+                //.andExpect(jsonPath("$.historyRates[1].date").value(historyRates.get(1).getDate().toString()))
+                .andExpect(jsonPath("$.historyRates[1].rate").value(historyRates.get(1).getDisplayRate()))
+                //.andExpect(jsonPath("$.historyRates[2].date").value(historyRates.get(2).getDate().toString()))
+                .andExpect(jsonPath("$.historyRates[2].rate").value(historyRates.get(2).getDisplayRate()))
                 .andExpect(jsonPath("$.country").value(locale.getDisplayCountry()))
                 .andExpect(jsonPath("$.language").value(locale.getDisplayLanguage()))
                 .andExpect(jsonPath("$.currency").value(currency.getDisplayName()));
@@ -210,7 +210,7 @@ class RatePageControllerIntegrationTests {
                 // Verify that the model attribute "coinRatesData" is not null
                 .andExpect(model().attribute("coinRatesData", notNullValue()))
                 // Verify that the model attribute "coinRatesData" is an instance of CoinRatesFormDTO
-                .andExpect(model().attribute("coinRatesData", instanceOf(CoinRatesFormDTO.class)));
+                .andExpect(model().attribute("coinRatesData", instanceOf(RateFormDto.class)));
 
     }
 

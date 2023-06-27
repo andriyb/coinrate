@@ -1,18 +1,21 @@
 package com.codingchallenge.coinrate.rategateway.service.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
-public class FormRateDto extends RateDto {
+public class FormRateDto extends CurrentRateDto {
 
     private List<HistoryRateDto> history;
 
-    public FormRateDto() {}
+    public FormRateDto() {
+
+    }
 
     public FormRateDto(String coinCode, String currencyCode, String coinName, String coinSymbol,
-                       BigDecimal currentRate, List<HistoryRateDto> history) {
+                       BigDecimal currentRate, LocalDateTime rateDateTime, List<HistoryRateDto> history) {
 
-        super(coinCode, currencyCode, coinName, coinSymbol, currentRate);
+        super(coinCode, currencyCode, coinName, coinSymbol, currentRate, rateDateTime);
         this.history = history;
     }
 

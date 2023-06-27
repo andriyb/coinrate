@@ -2,15 +2,10 @@ spring:
   application:
     name: currency-service
 
-  # Cache configuration
-  cache:
-    type: caffeine
-    cache-names: rateCache
-    caffeine:
-      spec: maximumSize=1000,expireAfterWrite=3m
+
 
   datasource:
-    url: jdbc:h2:file:c:/data/demo2
+    url: jdbc:h2:file:~/currency_db
     username: sa
     password:
     driverClassName: org.h2.Driver
@@ -66,8 +61,8 @@ eureka:
 #    enabled: false
 
 currency-service:
-  start-history-length: 5
-  history-length-limit: 7
+  history-days-count-default: 5
+  history-days-count-limit: 7
   query-per-min-limit: 10
   currency-filter: eur, usd, cad
   coin-filter: bitcoin, ethereum, tether, binancecoin, usd-coin, ripple, staked-ether, cardano, dogecoin, solana,

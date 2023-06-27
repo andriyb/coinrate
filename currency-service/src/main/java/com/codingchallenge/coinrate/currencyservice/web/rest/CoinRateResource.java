@@ -4,9 +4,7 @@ import java.util.List;
 
 import com.codingchallenge.coinrate.currencyservice.client.data.CoinList;
 import com.codingchallenge.coinrate.currencyservice.service.RateService;
-import com.codingchallenge.coinrate.currencyservice.service.dto.FormRateDto;
-import com.codingchallenge.coinrate.currencyservice.service.dto.HistoryRateDto;
-import com.codingchallenge.coinrate.currencyservice.service.dto.RateDto;
+import com.codingchallenge.coinrate.currencyservice.service.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,14 +34,14 @@ public class CoinRateResource {
             tags = { "get-current-rate", "get" })
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {
-                    @Content(schema = @Schema(implementation = RateDto.class), mediaType = "application/json") }),
+                    @Content(schema = @Schema(implementation = CurrentRateDto.class), mediaType = "application/json") }),
             @ApiResponse(responseCode = "500", description = "Internal Server Error"),
             @ApiResponse(responseCode = "404", description = "Not Found") })
     @GetMapping("/get-current-rate")
     public ResponseEntity<RateDto> getCurrentRate(@RequestParam(name = "coinCode") String coinCode,
                                          @RequestParam(name = "currencyCode") String currencyCode) {
 
-        RateDto rateDto = rateService.getCurrentRate(coinCode, currencyCode);
+        CurrentRateDto rateDto = rateService.getCurrentRate(coinCode, currencyCode);
         if (rateDto == null) {
             return ResponseEntity.notFound().build();
         }
@@ -99,8 +97,26 @@ public class CoinRateResource {
     @GetMapping("/get-supported-coins")
     public ResponseEntity<List<CoinList>> getSupportedCoins() {
 
-        return ResponseEntity.ok(rateService.getSupportedCoins());
+        List<CoinList> coinList = rateService.getSupportedCoins();
+        return ResponseEntity.ok(coinList);
     }
+
+    @Operation(
+            summary = "Returns rates history settings.",
+            description = "Returns rates history settings based on microservice properties.",
+            tags = { "get-history-settings", "get" })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = {
+                    @Content(schema = @Schema(implementation = HistorySettingsDto.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
+            @ApiResponse(responseCode = "404", description = "Not Found") })
+    @GetMapping("/get-history-settings")
+    public ResponseEntity<HistorySettingsDto> getHistorySettings() {
+
+        HistorySettingsDto historySettings = rateService.getHistorySettings();
+        return ResponseEntity.ok(historySettings);
+    }
+
 
     @Operation(
             summary = "Load rates history into microservice database.",

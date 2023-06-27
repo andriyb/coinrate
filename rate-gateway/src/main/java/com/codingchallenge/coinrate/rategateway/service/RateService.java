@@ -3,10 +3,7 @@ package com.codingchallenge.coinrate.rategateway.service;
 import com.codingchallenge.coinrate.rategateway.client.CurrencyServiceClient;
 import com.codingchallenge.coinrate.rategateway.client.LocaleServiceClient;
 import com.codingchallenge.coinrate.rategateway.client.data.CoinList;
-import com.codingchallenge.coinrate.rategateway.service.dto.CurrencyLocaleDto;
-import com.codingchallenge.coinrate.rategateway.service.dto.FormRateDto;
-import com.codingchallenge.coinrate.rategateway.service.dto.HistoryRateDto;
-import com.codingchallenge.coinrate.rategateway.service.dto.RateDto;
+import com.codingchallenge.coinrate.rategateway.service.dto.*;
 import org.apache.http.conn.util.InetAddressUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,9 +14,13 @@ import org.springframework.stereotype.Service;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.fasterxml.jackson.databind.type.LogicalType.DateTime;
 
 /**
  * Service class for handling currency locales using LocaleService.
@@ -82,7 +83,7 @@ public class RateService {
 
         if(!isValidIPAddress(ipAddress)) {
             currencyLocales.add(
-                    new CurrencyLocaleDto(defaultCountryCode, defaultLangCode, defaultCurrencyCode, true));
+                    new CurrencyLocaleDto(defaultCountryCode, defaultLangCode, defaultCurrencyCode, true, true));
             return currencyLocales;
         }
 
@@ -107,19 +108,19 @@ public class RateService {
      * @return The current rate.
      */
     @Cacheable(value = "rateCache", key = "#coinCode + '-' + #currencyCode")
-    public RateDto getCurrentRate(String coinCode, String currencyCode) {
+    public CurrentRateDto getCurrentRate(String coinCode, String currencyCode) {
 
-        RateDto rateDto = new RateDto();
+        CurrentRateDto currentRateDto = new CurrentRateDto();
 
         // Call the currency service client to get the current rate
-        ResponseEntity<RateDto> responseEntity = currencyServiceClient.getCurrentRate(coinCode, currencyCode);
+        ResponseEntity<CurrentRateDto> responseEntity =
+                currencyServiceClient.getCurrentRate(coinCode, currencyCode.toLowerCase());
 
         if (responseEntity != null &&
                 HttpStatus.OK.equals(responseEntity.getStatusCode())) {
-            rateDto = responseEntity.getBody();
+            currentRateDto = responseEntity.getBody();
         }
-
-        return rateDto;
+        return currentRateDto;
     }
 
     /**
@@ -135,7 +136,7 @@ public class RateService {
         List<HistoryRateDto> historyRates = new ArrayList<>();
 
         // Call the currency service client to get the rate history
-        ResponseEntity<List<HistoryRateDto>> responseEntity = currencyServiceClient.getRateHistory(coinCode, currencyCode, daysCount);
+        ResponseEntity<List<HistoryRateDto>> responseEntity = currencyServiceClient.getRateHistory(coinCode, currencyCode.toLowerCase(), daysCount);
 
         if (responseEntity != null &&
                 HttpStatus.OK.equals(responseEntity.getStatusCode())) {
@@ -188,6 +189,18 @@ public class RateService {
         }
 
         return supportedCoinsList;
+    }
+
+    public HistorySettingsDto getHistorySettings() {
+
+        ResponseEntity<HistorySettingsDto> responseEntity = currencyServiceClient.getHistorySettings();
+
+        if (responseEntity != null &&
+                HttpStatus.OK.equals(responseEntity.getStatusCode())) {
+            return responseEntity.getBody();
+        } else {
+            return new HistorySettingsDto(1,1);
+        }
     }
 
 }
