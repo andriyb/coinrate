@@ -8,6 +8,7 @@ import com.codingchallenge.coinrate.currencyservice.client.data.CoinList;
 import com.codingchallenge.coinrate.currencyservice.service.dto.CurrentRateDto;
 import com.codingchallenge.coinrate.currencyservice.service.dto.FormRateDto;
 import com.codingchallenge.coinrate.currencyservice.service.dto.HistoryRateDto;
+import com.codingchallenge.coinrate.currencyservice.service.dto.HistorySettingsDto;
 import com.codingchallenge.coinrate.currencyservice.service.mapper.CurrentRateMapper;
 import com.codingchallenge.coinrate.currencyservice.service.mapper.HistoryRateMapper;
 
@@ -21,7 +22,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,8 +46,11 @@ public class RateService implements ApplicationRunner {
     private final RateHistoryRepository rateHistoryRepository;
     private final GeckoApiClient geckoApiClient;
 
-    @Value("${currency-service.history-length-limit}")
-    private Integer historyLengthLimit;
+    @Value("${currency-service.history-days-count-limit}")
+    private Integer historyDaysCountLimit;
+
+    @Value("${currency-service.history-days-count-default}")
+    private Integer historyDaysCountDefault;
 
     @Value("${currency-service.query-per-min-limit}")
     private Integer queryPerMinLimit;
@@ -166,7 +169,7 @@ public class RateService implements ApplicationRunner {
      */
     public void loadRatesHistory() {
 
-        loadRatesHistory(new HashSet<>(currencyFilter), new HashSet<>(coinFilter), historyLengthLimit);
+        loadRatesHistory(new HashSet<>(currencyFilter), new HashSet<>(coinFilter), historyDaysCountLimit);
     }
 
 
@@ -266,7 +269,7 @@ public class RateService implements ApplicationRunner {
         HttpStatus coinHistoryResponseStatus = coinHistoryResponse.getStatusCode();
 
         if (coinHistoryResponseStatus == HttpStatus.OK) {
-            return CurrentRateMapper.toDto(coinHistoryResponse.getBody(), LocalDateTime.now());
+            return CurrentRateMapper.toDto(coinHistoryResponse.getBody(), currencyCode, LocalDateTime.now());
         }
 
         return null;
@@ -300,7 +303,7 @@ public class RateService implements ApplicationRunner {
 
         return new FormRateDto(
                 coinCode, currencyCode, currentRateDto.getCoinName(), currentRateDto.getCoinSymbol(),
-                currentRateDto.getCurrentRate(), history);
+                currentRateDto.getCurrentRate(), currentRateDto.getRateDateTime(), history);
     }
 
     /**
@@ -310,13 +313,13 @@ public class RateService implements ApplicationRunner {
      * @return The number of history days to retrieve.
      */
     private int historyDaysCalc(Integer daysCount) {
-        if (daysCount == null || daysCount > historyLengthLimit) {
-            return historyLengthLimit;
+        if (daysCount == null || daysCount > historyDaysCountLimit) {
+            return historyDaysCountLimit;
         } else {
             return daysCount;
         }
     }
-
+    @Cacheable(value = "supportedCoinsCache")
     public List<CoinList> getSupportedCoins() {
 
         ResponseEntity<List<CoinList>> coinListResponse = geckoApiClient.getCoinList();
@@ -329,6 +332,16 @@ public class RateService implements ApplicationRunner {
         }
 
         return null;
+    }
+
+    /**
+     * Returns History Settings.
+     *
+     * @return The HistorySettingsDto object.
+     */
+    public HistorySettingsDto getHistorySettings() {
+
+        return new HistorySettingsDto(historyDaysCountLimit, historyDaysCountDefault);
     }
 
 }

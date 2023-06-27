@@ -8,7 +8,7 @@ public class CurrencyLocaleDtoMapper {
     public CurrencyLocaleDto mapEntityToDto(CurrencyLocale entity) {
         CurrencyLocaleDto dto =
                 new CurrencyLocaleDto(entity.getCountryCode(), entity.getLangCode(),
-                        entity.getCurrencyCode(), entity.isDefaultCurrency());
+                        entity.getCurrencyCode(), entity.isDefaultCurrency(), false);
 
         return dto;
     }

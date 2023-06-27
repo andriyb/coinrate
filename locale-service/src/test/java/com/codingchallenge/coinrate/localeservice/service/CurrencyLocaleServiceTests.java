@@ -31,7 +31,8 @@ public class CurrencyLocaleServiceTests {
     void getNetherlands() {
 
         CurrencyLocaleDto toCompare =
-                new CurrencyLocaleDto(NL_COUNTRY_CODE, NL_LANG_CODE, EUR_CURRENCY_CODE, true);
+                new CurrencyLocaleDto(NL_COUNTRY_CODE, NL_LANG_CODE, EUR_CURRENCY_CODE,
+                        true, false);
 
         // Get the CurrencyLocaleDto object from the service method for a known IP address in Netherlands
         CurrencyLocaleDto res = currencyLocaleService.getCurrencyLocales(KNOWN_NL_IP_ADDRESS).get(0);
@@ -49,7 +50,8 @@ public class CurrencyLocaleServiceTests {
     void hostNotFound() {
 
         CurrencyLocaleDto toCompare =
-                new CurrencyLocaleDto(DE_COUNTRY_CODE, DE_LANG_CODE, EUR_CURRENCY_CODE, true);
+                new CurrencyLocaleDto(DE_COUNTRY_CODE, DE_LANG_CODE, EUR_CURRENCY_CODE,
+                        true, false);
 
         // Get the CurrencyLocaleDto object from the service method for an unknown IP address
         CurrencyLocaleDto res = currencyLocaleService.getCurrencyLocales(UNKNOWN_IP_ADDRESS).get(0);

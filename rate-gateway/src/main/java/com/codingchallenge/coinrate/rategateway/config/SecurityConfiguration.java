@@ -29,6 +29,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
+                .antMatchers( "/favicon.ico").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

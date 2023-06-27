@@ -29,6 +29,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        return new CustomUserDetails(username, encoder.encode("123"), true, true, true, true, null, null, null, null, null);
+        return new CustomUserDetails(username, encoder.encode("123"), true, true, true, true, null);
     }
 }

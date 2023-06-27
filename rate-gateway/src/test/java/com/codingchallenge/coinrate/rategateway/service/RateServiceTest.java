@@ -70,7 +70,8 @@ class RateServiceTest {
             defaultCurrencyLocaleDto = new CurrencyLocaleDto(
                     ReflectionTestUtils.getField(rateService, "defaultCountryCode").toString(),
                     ReflectionTestUtils.getField(rateService, "defaultLangCode").toString(),
-                    ReflectionTestUtils.getField(rateService, "defaultCurrencyCode").toString(), true);
+                    ReflectionTestUtils.getField(rateService, "defaultCurrencyCode").toString(),
+                    true, false);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -85,9 +86,11 @@ class RateServiceTest {
         // Create a list of expected currency locales for a known IP address
         List<CurrencyLocaleDto> expectedCurrencyLocales = new ArrayList<>();
         expectedCurrencyLocales.add(
-                new CurrencyLocaleDto(NL_COUNTRY_CODE, NL_LANG_CODE, EUR_CURRENCY_CODE, true));
+                new CurrencyLocaleDto(NL_COUNTRY_CODE, NL_LANG_CODE, EUR_CURRENCY_CODE,
+                        true, false));
         expectedCurrencyLocales.add(
-                new CurrencyLocaleDto(GB_COUNTRY_CODE, GB_LANG_CODE, GBP_CURRENCY_CODE, false));
+                new CurrencyLocaleDto(GB_COUNTRY_CODE, GB_LANG_CODE, GBP_CURRENCY_CODE,
+                        false, false));
 
         // Mock the response from the LocaleServiceClient for a known IP address
         when(localeServiceClient.getCurrencyLocales(KNOWN_NL_VALID_IP_ADDRESS)).thenReturn(

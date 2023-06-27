@@ -6,11 +6,14 @@ public class CurrencyLocaleDto {
     public CurrencyLocaleDto(){
     }
 
-    public CurrencyLocaleDto(String countryCode, String langCode, String currencyCode, boolean defaultCurrency) {
+    public CurrencyLocaleDto(String countryCode, String langCode, String currencyCode, boolean defaultCurrency,
+                             boolean localeNotFound) {
+
         this.countryCode = countryCode;
         this.langCode = langCode;
         this.currencyCode = currencyCode;
         this.defaultCurrency = defaultCurrency;
+        this.isLocaleNotFound = localeNotFound;
     }
 
     private String countryCode;
@@ -20,6 +23,8 @@ public class CurrencyLocaleDto {
 
 
     private String currencyCode;
+
+    private boolean isLocaleNotFound;
 
 
     private boolean defaultCurrency;
@@ -56,4 +61,11 @@ public class CurrencyLocaleDto {
         this.defaultCurrency = defaultCurrency;
     }
 
+    public boolean isLocaleNotFound() {
+        return isLocaleNotFound;
+    }
+
+    public void setLocaleNotFound(boolean localeNotFound) {
+        isLocaleNotFound = localeNotFound;
+    }
 }
