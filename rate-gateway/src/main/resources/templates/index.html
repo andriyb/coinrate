@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
-
+    <link rel="stylesheet" th:href="@{/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/bootstrap-select.min.css}">
 
     <style>
         h1 {
@@ -34,6 +32,33 @@
         function runAtMidnight() {
             // Your code here
             //console.log("Running at midnight (UTC)");
+        }
+
+        function buildTable(historyRates, tbodyElement) {
+            for (let i = 0; i < historyRates.length; i++) {
+                let divElement = document.createElement('div');
+                divElement.setAttribute('class', 'input-group mb-2');
+
+                let valueCell = document.createElement('div');
+                valueCell.setAttribute('class', 'input-group-prepend');
+
+                let valueLabel = document.createElement('label');
+                valueLabel.setAttribute('class', 'input-group-text label-min-width');
+                valueLabel.textContent = historyRates[i].displayRate;
+
+                valueCell.appendChild(valueLabel);
+
+                divElement.appendChild(valueCell);
+
+                let dateCell = document.createElement('div');
+                dateCell.setAttribute('type', 'text');
+                dateCell.setAttribute('class', 'form-control');
+                dateCell.textContent = historyRates[i].displayRateDate;
+
+                divElement.appendChild(dateCell);
+
+                tbodyElement.appendChild(divElement);
+            }
         }
 
         function scheduleMidnightTask() {
@@ -102,19 +127,7 @@
                     tbodyElement.innerHTML = '';
                     let historyRates = response.historyRatesForm;
 
-                    for (let i = 0; i < historyRates.length; i++) {
-                        let newRow = document.createElement('tr');
-
-                        let valueCell = document.createElement('td');
-                        valueCell.textContent = historyRates[i].displayRate;
-                        newRow.appendChild(valueCell);
-
-                        let dateCell = document.createElement('td');
-                        dateCell.textContent = historyRates[i].displayRateDate;
-                        newRow.appendChild(dateCell);
-
-                        tbodyElement.appendChild(newRow);
-                    }
+                    buildTable(historyRates, tbodyElement);
 
 
                 } else {
@@ -160,20 +173,7 @@
                     tbodyElement.innerHTML = '';
                     let historyRates = response.historyRatesForm;
 
-                    for (let i = 0; i < historyRates.length; i++) {
-                        let newRow = document.createElement('tr');
-
-                        let valueCell = document.createElement('td');
-                        valueCell.textContent = historyRates[i].displayRate;
-                        newRow.appendChild(valueCell);
-
-                        let dateCell = document.createElement('td');
-                        dateCell.textContent = historyRates[i].displayRateDate;
-                        newRow.appendChild(dateCell);
-
-                        tbodyElement.appendChild(newRow);
-                    }
-
+                    buildTable(historyRates, tbodyElement);
 
                 } else {
                     // Handle error cases
@@ -224,21 +224,9 @@
 
                     let tbodyElement = document.getElementById('history-table-body');
                     tbodyElement.innerHTML = '';
-                    let historyRates = response;
 
-                    for (let i = 0; i < historyRates.length; i++) {
-                        let newRow = document.createElement('tr');
+                    buildTable(response, tbodyElement);
 
-                        let valueCell = document.createElement('td');
-                        valueCell.textContent = historyRates[i].displayRate;
-                        newRow.appendChild(valueCell);
-
-                        let dateCell = document.createElement('td');
-                        dateCell.textContent = historyRates[i].displayRateDate;
-                        newRow.appendChild(dateCell);
-
-                        tbodyElement.appendChild(newRow);
-                    }
                 } else {
                     // Handle error cases
                     console.log("Error: " + xhr.status);
@@ -302,11 +290,11 @@
                         </div>
                         <div class="input-group mb-2">
                             <div class="input-group-prepend">
-                                <label class="input-group-text label-min-width" for="country-input">Locale settings status</label>
+                                <label class="input-group-text label-min-width" for="ip-status-input">Locale settings status</label>
                             </div>
 
                             <input id="ip-status-input" type="text" class="form-control"
-                                   th:value ="${pageForm.locale.localeNotFound} ? 'IP Address is not found, using default settings.' : 'Locale detected successfully.'" readonly>
+                                   th:value ="${pageForm.localeForm.localeNotFound} ? 'IP Address is not found, using default settings.' : 'Locale detected successfully.'" readonly>
 
                         </div>
                         <div class="input-group mb-2">
@@ -315,7 +303,7 @@
                             </div>
 
                             <input id="country-input" type="text" class="form-control"
-                                   th:field="${pageForm.locale.country}" readonly>
+                                   th:field="${pageForm.localeForm.country}" readonly>
 
                         </div>
                         <div class="input-group mb-2">
@@ -324,7 +312,7 @@
                             </div>
 
                             <input id="currency-input" type="text" class="form-control"
-                                   th:field="${pageForm.locale.currency}" readonly>
+                                   th:field="${pageForm.localeForm.currency}" readonly>
 
                         </div>
                         <div class="input-group mb-2">
@@ -333,7 +321,7 @@
                             </div>
 
                             <input id="current-rate-input" type="text" class="form-control"
-                                   th:field="${pageForm.currentRate.displayRate}" readonly>
+                                   th:field="${pageForm.currentRateForm.displayRate}" readonly>
 
                             <span class="input-group-btn">
                                 <button class="btn border border-secondary" type="button" onclick="sendUpdateCurrentRateRequest();">Update</button>
@@ -346,12 +334,12 @@
                             </div>
 
                             <input id="update-time-input" type="text" class="form-control"
-                                   th:field="${pageForm.currentRate.displayUpdateDateTime}" readonly>
+                                   th:field="${pageForm.currentRateForm.displayUpdateDateTime}" readonly>
 
                         </div>
                         <div class="input-group mb-2">
                             <div class="input-group-prepend">
-                                <label class="input-group-text label-min-width" for="current-rate-input">Rates History Length</label>
+                                <label class="input-group-text label-min-width" for="input-days-count">Rates History Length</label>
                             </div>
 
                             <select class="form-select" id="input-days-count" onchange="sendChangeDaysCountRequest();">
@@ -364,36 +352,29 @@
                         </div>
                         <br/>
                     </form>
-
-                        <div class="row">
-                            <div class="col">
-
-                                <table id="history-table" class="table table-bordered table-striped table-hover">
-
-                                    <tbody id="history-table-body">
-                                    <tr th:each="data : ${pageForm.historyRates}">
-                                        <td th:text="${data.displayRate}"></td>
-                                        <td th:text="${data.displayRateDate}"></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
+                    <h6>Rate History</h6>
+                    <div class="row">
+                        <div id="history-table-body" class="col">
+                            <div th:each="data : ${pageForm.historyRateForms}">
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text label-min-width" for="currency-input" th:text="${data.displayRate}"></label>
+                                    </div>
+                                    <div class="form-control" th:text="${data.displayRateDate}"></div>
+                                </div>
                             </div>
                         </div>
-
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
-<script>
-    $('#lang').selectpicker();
-</script>
+<script th:src="@{/jquery-3.6.0.min.js}"></script>
+<script th:src="@{/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/bootstrap-select.min.js}"></script>
 
 </body>
 </html>
