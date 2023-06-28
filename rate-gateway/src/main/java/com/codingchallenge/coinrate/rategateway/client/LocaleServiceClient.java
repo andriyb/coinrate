@@ -1,6 +1,6 @@
 package com.codingchallenge.coinrate.rategateway.client;
 
-import com.codingchallenge.coinrate.rategateway.service.dto.CurrencyLocaleDto;
+import com.codingchallenge.coinrate.rategateway.client.dto.CurrencyLocaleDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;

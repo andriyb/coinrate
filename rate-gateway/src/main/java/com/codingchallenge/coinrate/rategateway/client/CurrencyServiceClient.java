@@ -1,12 +1,6 @@
 package com.codingchallenge.coinrate.rategateway.client;
 
-
-//import com.codingchallenge.coinrate.rategateway.client.data.FormRateDto;
-//import com.codingchallenge.coinrate.rategateway.client.data.HistoryRateDto;
-//import com.codingchallenge.coinrate.rategateway.client.data.RateDto;
-import com.codingchallenge.coinrate.rategateway.service.dto.*;
-
-import com.codingchallenge.coinrate.rategateway.client.data.CoinList;
+import com.codingchallenge.coinrate.rategateway.client.dto.*;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +30,7 @@ public interface CurrencyServiceClient {
      * @return HTTP response with status code.
      */
     @PutMapping("/api/v1/load-history")
-    public ResponseEntity<?> loadHistory();
+    ResponseEntity<?> loadHistory();
 
     /**
      * Delete rates history from microservice database.
@@ -44,7 +38,7 @@ public interface CurrencyServiceClient {
      * @return HTTP response with status code.
      */
     @DeleteMapping("/api/v1/delete-rate-history")
-    public ResponseEntity<?> deleteRateHistory();
+    ResponseEntity<?> deleteRateHistory();
 
 
     /**
@@ -67,7 +61,7 @@ public interface CurrencyServiceClient {
     @RequestMapping(method = RequestMethod.GET,
             value = "${microservices.currencyService.urlPath}${microservices.currencyService.currentRateEndpoint}")
     ResponseEntity<CurrentRateDto> getCurrentRate(@RequestParam("coinCode") String coinCode,
-                                           @RequestParam("currencyCode") String currencyCode);
+                                                  @RequestParam("currencyCode") String currencyCode);
 
     /**
      * Retrieves the rate history for a specific coin and currency from the Currency Service.

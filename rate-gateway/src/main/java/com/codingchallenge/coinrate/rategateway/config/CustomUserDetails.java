@@ -1,15 +1,13 @@
 package com.codingchallenge.coinrate.rategateway.config;
 
-import com.codingchallenge.coinrate.rategateway.service.dto.CurrencyLocaleDto;
-import com.codingchallenge.coinrate.rategateway.web.dto.LocaleFormDto;
+import com.codingchallenge.coinrate.rategateway.service.dto.form.LocaleFormDto;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
- * The custom user details for RatePageController.
+ * The custom user details for security configuration.
  */
 public class CustomUserDetails implements UserDetails {
 
@@ -20,19 +18,19 @@ public class CustomUserDetails implements UserDetails {
     private boolean credentialsNonExpired;
     private boolean enabled;
     private Collection<? extends GrantedAuthority> authorities;
-
-    private CurrencyLocaleDto currencyLocale;
+    private LocaleFormDto localeForm;
 
     public CustomUserDetails() {}
 
-    public CustomUserDetails(String username, String password, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled, CurrencyLocaleDto currencyLocale) {
+    public CustomUserDetails(String username, String password, boolean accountNonExpired, boolean accountNonLocked,
+                             boolean credentialsNonExpired, boolean enabled, LocaleFormDto localeForm) {
         this.username = username;
         this.password = password;
         this.accountNonExpired = accountNonExpired;
         this.accountNonLocked = accountNonLocked;
         this.credentialsNonExpired = credentialsNonExpired;
         this.enabled = enabled;
-        this.currencyLocale = currencyLocale;
+        this.localeForm = localeForm;
     }
 
     @Override
@@ -98,11 +96,11 @@ public class CustomUserDetails implements UserDetails {
         this.authorities = authorities;
     }
 
-    public CurrencyLocaleDto getCurrencyLocale() {
-        return currencyLocale;
+    public LocaleFormDto getLocaleForm() {
+        return localeForm;
     }
 
-    public void setCurrencyLocale(CurrencyLocaleDto currencyLocale) {
-        this.currencyLocale = currencyLocale;
+    public void setLocaleForm(LocaleFormDto localeForm) {
+        this.localeForm = localeForm;
     }
 }

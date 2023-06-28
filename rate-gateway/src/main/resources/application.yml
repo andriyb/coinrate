@@ -2,6 +2,10 @@ rate-gateway:
   default-country-code: DE
   default-lang-code: de
   default-currency-code: EUR
+  current-rate-date-format: EEEE, dd MMM, yyyy HH:mm:ss
+  history-rate-date-format: dd MMM, yyyy
+  scaled-rate-precision: 6
+  scaled-rate-scale: 2
 
 spring:
   application:
