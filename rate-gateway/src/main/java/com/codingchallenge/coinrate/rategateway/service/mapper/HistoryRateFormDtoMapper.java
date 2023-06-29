@@ -42,7 +42,7 @@ public class HistoryRateFormDtoMapper {
                     String displayRate = RateScaleUtil.getScaledRate(rate, desiredPrecision, desiredScale,
                             historyRate.getCoinSymbol(), currencyFormat);
 
-                    return new HistoryRateFormDto(formattedDate, displayRate);
+                    return new HistoryRateFormDto(displayRate, formattedDate);
                 })
                 .collect(Collectors.toList());
     }

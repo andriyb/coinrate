@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
+    private static final String HARDCODED_USER = "user";
+
+    private static final String HARDCODED_PWD = "123";
+
     private final PasswordEncoder encoder;
 
     @Autowired
@@ -30,6 +34,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        return new CustomUserDetails(username, encoder.encode("123"), true, true, true, true, null);
+        if (HARDCODED_USER.equals(username)) {
+            return new CustomUserDetails(username, encoder.encode(HARDCODED_PWD), true, true, true, true, null);
+        } else {
+            throw new UsernameNotFoundException("User " + username + " is not available.");
+        }
     }
 }

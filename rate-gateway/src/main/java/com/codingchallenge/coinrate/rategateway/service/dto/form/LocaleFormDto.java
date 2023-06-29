@@ -1,4 +1,7 @@
 package com.codingchallenge.coinrate.rategateway.service.dto.form;
+
+import java.util.Objects;
+
 public class LocaleFormDto {
 
     private String country;
@@ -27,6 +30,22 @@ public class LocaleFormDto {
         this.currencyCode = currencyCode;
         this.isDefault = isDefault;
         this.isLocaleNotFound = isLocaleNotFound;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LocaleFormDto that = (LocaleFormDto) o;
+        return isDefault == that.isDefault && isLocaleNotFound == that.isLocaleNotFound &&
+                Objects.equals(country, that.country) && Objects.equals(countryCode, that.countryCode) &&
+                Objects.equals(language, that.language) && Objects.equals(langCode, that.langCode) &&
+                Objects.equals(currency, that.currency) && Objects.equals(currencyCode, that.currencyCode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCountry(), getCountryCode(), getLanguage(), getLangCode(), getCurrency(), getCurrencyCode(), isDefault(), isLocaleNotFound());
     }
 
     public String getCountry() {

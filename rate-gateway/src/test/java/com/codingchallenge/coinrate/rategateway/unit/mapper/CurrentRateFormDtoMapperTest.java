@@ -1,4 +1,4 @@
-package com.codingchallenge.coinrate.rategateway.mapper;
+package com.codingchallenge.coinrate.rategateway.unit.mapper;
 import com.codingchallenge.coinrate.rategateway.client.dto.CurrentRateDto;
 import com.codingchallenge.coinrate.rategateway.service.dto.form.CurrentRateFormDto;
 import com.codingchallenge.coinrate.rategateway.service.mapper.CurrentRateFormDtoMapper;
