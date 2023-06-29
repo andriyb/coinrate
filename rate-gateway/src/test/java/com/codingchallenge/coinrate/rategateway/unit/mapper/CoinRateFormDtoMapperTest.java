@@ -1,4 +1,4 @@
-package com.codingchallenge.coinrate.rategateway.mapper;
+package com.codingchallenge.coinrate.rategateway.unit.mapper;
 
 import com.codingchallenge.coinrate.rategateway.client.dto.FormRateDto;
 import com.codingchallenge.coinrate.rategateway.client.dto.HistoryRateDto;
@@ -31,7 +31,7 @@ class CoinRateFormDtoMapperTest {
                         new BigDecimal("0.000027933"), LocalDate.parse("2023-06-26")) ,
 
                 new HistoryRateDto("bitcoin", "EUR", "Bitcoin", "btc",
-                        new BigDecimal("0.27933"), LocalDate.parse("2023-06-25") )
+                        new BigDecimal("0.27933"), LocalDate.parse("2023-06-25"))
         ));
         List<String> supportedCoins = Arrays.asList("bitcoin", "ethereum", "action-coin");
         String selectedCoin = "bitcoin";

@@ -1,4 +1,4 @@
-package com.codingchallenge.coinrate.rategateway.util;
+package com.codingchallenge.coinrate.rategateway.unit.util;
 
 import com.codingchallenge.coinrate.rategateway.service.util.IpAddressUtil;
 import org.junit.jupiter.api.Assertions;

@@ -8,6 +8,8 @@ import com.codingchallenge.coinrate.rategateway.service.mapper.HistoryRateFormDt
 import com.codingchallenge.coinrate.rategateway.service.mapper.HistorySettingsFormDtoMapper;
 import com.codingchallenge.coinrate.rategateway.service.mapper.CoinRateFormDtoMapper;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -24,8 +26,6 @@ import java.util.stream.Collectors;
 @Service
 public class CoinRateService {
 
-    final CurrencyServiceClient currencyServiceClient;
-
     @Value("${rate-gateway.scaled-rate-precision}")
     private Integer scaledRatePrecision = 6;
 
@@ -37,6 +37,10 @@ public class CoinRateService {
 
     @Value("${rate-gateway.history-rate-date-format}")
     private String historyRateDateFormat = "dd MMM, yyyy";
+
+    private static final Logger logger = LogManager.getLogger(CoinRateService.class);
+
+    final CurrencyServiceClient currencyServiceClient;
 
     @Autowired
     public CoinRateService(CurrencyServiceClient currencyServiceClient) {
@@ -119,11 +123,19 @@ public class CoinRateService {
 
         if (responseEntity != null &&
                 HttpStatus.OK.equals(responseEntity.getStatusCode())) {
-            FormRateDto formRateDto = responseEntity.getBody();
 
-            return CoinRateFormDtoMapper.mapClientToFormDto(formRateDto, supportedCoins, coinCode, ipAddress,
-                    localeForm, historySettingsForm, currentRateDateFormat, historyRateDateFormat,
-                    scaledRatePrecision, scaledRateScale, locale);
+            FormRateDto formRateDto = responseEntity.getBody();
+            if (formRateDto != null) {
+                return CoinRateFormDtoMapper.mapClientToFormDto(formRateDto, supportedCoins, coinCode, ipAddress,
+                        localeForm, historySettingsForm, currentRateDateFormat, historyRateDateFormat,
+                        scaledRatePrecision, scaledRateScale, locale);
+            } else {
+                logger.info("FormRateDto from currencyServiceClient.getFormRate(coinCode, currencyCode, daysCount) " +
+                        "is null. CoinCode=" + coinCode + ", currencyCode=" + currencyCode);
+            }
+        }else {
+            logger.info("ResponseEntity from currencyServiceClient.getFormRate(coinCode, currencyCode, daysCount) " +
+                    " is null or not OK for CoinCode=" + coinCode + ", currencyCode=" + currencyCode);
         }
 
         return rateForm;
