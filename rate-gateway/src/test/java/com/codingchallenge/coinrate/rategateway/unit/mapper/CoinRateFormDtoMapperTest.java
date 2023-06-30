@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -46,7 +47,7 @@ class CoinRateFormDtoMapperTest {
 
         // Perform the mapping
         CoinRateFormDto result = CoinRateFormDtoMapper.mapClientToFormDto(formRateDto, supportedCoins, selectedCoin,
-                ipAddress, localeForm, historySettings, currentRateDateFormat, historyRateDateFormat,
+                ipAddress, localeForm, historySettings, LocalDateTime.now(), currentRateDateFormat, historyRateDateFormat,
                 desiredPrecision, desiredScale, locale);
 
         // Assert the mapping result
@@ -92,8 +93,8 @@ class CoinRateFormDtoMapperTest {
 
         // Perform the mapping
         CoinRateFormDto result = CoinRateFormDtoMapper.mapClientToFormDto(formRateDto, supportedCoins, selectedCoin,
-                ipAddress, localeForm, historySettings, currentRateDateFormat, historyRateDateFormat,
-                desiredPrecision, desiredScale, locale);
+                ipAddress, localeForm, historySettings, LocalDateTime.now(), currentRateDateFormat,
+                historyRateDateFormat, desiredPrecision, desiredScale, locale);
 
         // Assert the mapping result
         Assertions.assertEquals(supportedCoins, result.getSupportedCoins());

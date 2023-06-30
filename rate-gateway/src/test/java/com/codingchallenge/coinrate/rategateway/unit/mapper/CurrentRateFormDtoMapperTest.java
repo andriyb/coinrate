@@ -29,6 +29,7 @@ class CurrentRateFormDtoMapperTest {
 
         // Perform the mapping
         CurrentRateFormDto result = CurrentRateFormDtoMapper.mapClientToFormDto(currentRateDto,
+                LocalDateTime.now(),
                 currentRateDateFormat, desiredPrecision, desiredScale, locale);
 
         // Assert the mapping result
@@ -51,7 +52,7 @@ class CurrentRateFormDtoMapperTest {
         Locale locale = Locale.GERMANY;
 
         // Perform the mapping
-        CurrentRateFormDto result = CurrentRateFormDtoMapper.mapClientToFormDto(currentRateDto,
+        CurrentRateFormDto result = CurrentRateFormDtoMapper.mapClientToFormDto(currentRateDto, LocalDateTime.now(),
                 currentRateDateFormat, desiredPrecision, desiredScale, locale);
 
         // Assert the mapping result
