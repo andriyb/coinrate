@@ -60,8 +60,8 @@ class CoinRateFormDtoMapperTest {
 
         // Assert the current rate
         CurrentRateFormDto currentRateForm = result.getCurrentRateForm();
-        Assertions.assertNotNull(currentRateForm.getDisplayRate());
-        Assertions.assertNotNull(currentRateForm.getDisplayUpdateDateTime());
+        Assertions.assertNotNull(currentRateForm.getFormattedRate());
+        Assertions.assertNotNull(currentRateForm.getFormattedUpdateDateTime());
 
         // Assert the history rates
         List<HistoryRateFormDto> historyRateForm = result.getHistoryRateForms();
@@ -105,7 +105,7 @@ class CoinRateFormDtoMapperTest {
 
         // Assert the current rate
         CurrentRateFormDto currentRateForm = result.getCurrentRateForm();
-        Assertions.assertNotNull(currentRateForm.getDisplayRate());
-        Assertions.assertNotNull(currentRateForm.getDisplayUpdateDateTime());
+        Assertions.assertNotNull(currentRateForm.getFormattedRate());
+        Assertions.assertNotNull(currentRateForm.getFormattedUpdateDateTime());
     }
 }

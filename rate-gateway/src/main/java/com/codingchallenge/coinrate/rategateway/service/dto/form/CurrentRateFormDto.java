@@ -5,8 +5,9 @@ package com.codingchallenge.coinrate.rategateway.service.dto.form;
  */
 public class CurrentRateFormDto {
 
-    private String displayRate;
-    private String displayUpdateDateTime;
+    private String formattedRate;
+    private String formattedUpdateDateTime;
+    private String formattedUpdateRequestDateTime;
 
     /**
      * Default constructor for CurrentRateFormDto.
@@ -17,47 +18,68 @@ public class CurrentRateFormDto {
     /**
      * Constructor for CurrentRateFormDto with display rate and update date/time.
      *
-     * @param displayRate          The display rate to be set.
-     * @param displayUpdateDateTime The display update date/time to be set.
+     * @param formattedRate          The formatted rate to be set.
+     * @param formattedUpdateDateTime The formatted update date/time to be set.
+     * @param formattedUpdateRequestDateTime The formatted update request date/time to be set.
      */
-    public CurrentRateFormDto(String displayRate, String displayUpdateDateTime) {
-        this.displayRate = displayRate;
-        this.displayUpdateDateTime = displayUpdateDateTime;
+    public CurrentRateFormDto(String formattedRate, String formattedUpdateDateTime,
+                              String formattedUpdateRequestDateTime) {
+        this.formattedRate = formattedRate;
+        this.formattedUpdateDateTime = formattedUpdateDateTime;
+        this.formattedUpdateRequestDateTime = formattedUpdateRequestDateTime;
     }
 
     /**
-     * Gets the display rate.
+     * Gets the formatted rate.
      *
      * @return The display rate.
      */
-    public String getDisplayRate() {
-        return displayRate;
+    public String getFormattedRate() {
+        return formattedRate;
     }
 
     /**
-     * Sets the display rate.
+     * Sets the formatted rate.
      *
-     * @param displayRate The display rate to be set.
+     * @param formattedRate The display rate to be set.
      */
-    public void setDisplayRate(String displayRate) {
-        this.displayRate = displayRate;
+    public void setFormattedRate(String formattedRate) {
+        this.formattedRate = formattedRate;
     }
 
     /**
-     * Gets the display update date/time.
+     * Gets the formatted update date/time.
      *
-     * @return The display update date/time.
+     * @return The formatted update date/time.
      */
-    public String getDisplayUpdateDateTime() {
-        return displayUpdateDateTime;
+    public String getFormattedUpdateDateTime() {
+        return formattedUpdateDateTime;
     }
 
     /**
-     * Sets the display update date/time.
+     * Sets the formatted update date/time.
      *
-     * @param displayUpdateDateTime The display update date/time to be set.
+     * @param formattedUpdateDateTime The formatted update date/time to be set.
      */
-    public void setDisplayUpdateDateTime(String displayUpdateDateTime) {
-        this.displayUpdateDateTime = displayUpdateDateTime;
+    public void setFormattedUpdateDateTime(String formattedUpdateDateTime) {
+        this.formattedUpdateDateTime = formattedUpdateDateTime;
+    }
+
+    /**
+     * Gets the formatted update request date/time.
+     *
+     * @return The formatted update request date/time.
+     */
+    public String getFormattedUpdateRequestDateTime() {
+        return formattedUpdateRequestDateTime;
+    }
+
+    /**
+     * Sets the formatted update request date/time.
+     *
+     * @param formattedUpdateRequestDateTime The formatted update request date/time to be set.
+     */
+    public void setFormattedUpdateRequestDateTime(String formattedUpdateRequestDateTime) {
+        this.formattedUpdateRequestDateTime = formattedUpdateRequestDateTime;
     }
 }

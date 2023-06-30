@@ -34,8 +34,8 @@ class CurrentRateFormDtoMapperTest {
         // Assert the mapping result
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(locale);
         String formattedRate = "10 btc = " + currencyFormat.format(new BigDecimal("1234.56"));
-        Assertions.assertEquals(formattedRate, result.getDisplayRate());
-        Assertions.assertEquals("2023-06-27 09:30:00", result.getDisplayUpdateDateTime());
+        Assertions.assertEquals(formattedRate, result.getFormattedRate());
+        Assertions.assertEquals("2023-06-27 09:30:00", result.getFormattedUpdateDateTime());
     }
 
     @Test
@@ -57,7 +57,7 @@ class CurrentRateFormDtoMapperTest {
         // Assert the mapping result
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(locale);
         String formattedRate = "10 btc = " + currencyFormat.format(new BigDecimal("7890.12"));
-        Assertions.assertEquals(formattedRate, result.getDisplayRate());
-        Assertions.assertEquals("", result.getDisplayUpdateDateTime());
+        Assertions.assertEquals(formattedRate, result.getFormattedRate());
+        Assertions.assertEquals("", result.getFormattedUpdateDateTime());
     }
 }

@@ -76,7 +76,7 @@ public class SecurityConfiguration {
     public void configureGlobal(AuthenticationManagerBuilder auth, PasswordEncoder passwordEncoder) throws Exception {
         auth.inMemoryAuthentication()
                 .withUser("user")
-                .password(passwordEncoder.encode("123")) // Set the encoded password for the user
+                .password(passwordEncoder.encode("1234")) // Set the encoded password for the user
                 .roles("USER"); // Assign the "USER" role to the user
     }
 

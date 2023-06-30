@@ -18,8 +18,8 @@ public class CurrentRateMapper {
                 return new CurrentRateDto(
                         historyCoin.getCode(),
                         currencyCode,
-                        historyCoin.getSymbol(),
                         historyCoin.getName(),
+                        historyCoin.getSymbol(),
                         rateValue,
                         currentDateTime);
             }

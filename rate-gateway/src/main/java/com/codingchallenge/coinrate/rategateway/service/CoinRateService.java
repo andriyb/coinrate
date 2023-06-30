@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -68,8 +69,8 @@ public class CoinRateService {
             CurrentRateDto currentRateDto = responseEntity.getBody();
 
             if (currentRateDto != null) {
-                return CurrentRateFormDtoMapper.mapClientToFormDto(currentRateDto, currentRateDateFormat,
-                        scaledRatePrecision, scaledRateScale, locale);
+                return CurrentRateFormDtoMapper.mapClientToFormDto(currentRateDto, LocalDateTime.now(),
+                        currentRateDateFormat, scaledRatePrecision, scaledRateScale, locale);
             }
         }
         return defaultCurrentRateForm;
@@ -127,7 +128,8 @@ public class CoinRateService {
             FormRateDto formRateDto = responseEntity.getBody();
             if (formRateDto != null) {
                 return CoinRateFormDtoMapper.mapClientToFormDto(formRateDto, supportedCoins, coinCode, ipAddress,
-                        localeForm, historySettingsForm, currentRateDateFormat, historyRateDateFormat,
+                        localeForm, historySettingsForm, LocalDateTime.now(),
+                        currentRateDateFormat, historyRateDateFormat,
                         scaledRatePrecision, scaledRateScale, locale);
             } else {
                 logger.info("FormRateDto from currencyServiceClient.getFormRate(coinCode, currencyCode, daysCount) " +
