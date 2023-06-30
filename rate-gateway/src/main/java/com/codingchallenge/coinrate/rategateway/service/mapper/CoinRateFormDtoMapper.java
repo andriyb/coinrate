@@ -3,6 +3,7 @@ package com.codingchallenge.coinrate.rategateway.service.mapper;
 import com.codingchallenge.coinrate.rategateway.client.dto.FormRateDto;
 import com.codingchallenge.coinrate.rategateway.service.dto.form.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
@@ -20,6 +21,7 @@ public class CoinRateFormDtoMapper {
      * @param ipAddress            The IP address.
      * @param localeForm           The locale form data.
      * @param historySettings      The history settings.
+     * @param requestTime           The current rate requestTime.
      * @param currentRateDateFormat  The date format for the current rate.
      * @param historyRateDateFormat  The date format for the history rate.
      * @param desiredPrecision     The desired precision for scaling the rates.
@@ -30,12 +32,13 @@ public class CoinRateFormDtoMapper {
     public static CoinRateFormDto mapClientToFormDto(FormRateDto formRate, List<String> supportedCoins,
                                                      String selectedCoin, String ipAddress,
                                                      LocaleFormDto localeForm, HistorySettingsFormDto historySettings,
+                                                     LocalDateTime requestTime,
                                                      String currentRateDateFormat, String historyRateDateFormat,
                                                      int desiredPrecision, int desiredScale, Locale locale) {
 
         // Map the current rate data
         CurrentRateFormDto currentRateForm = CurrentRateFormDtoMapper.mapClientToFormDto(formRate,
-                currentRateDateFormat, desiredPrecision, desiredScale, locale);
+                requestTime,currentRateDateFormat, desiredPrecision, desiredScale, locale);
 
         // Map the history rate data
         List<HistoryRateFormDto> historyRateForm  =

@@ -42,11 +42,11 @@ class HistoryRateFormDtoMapperTest {
         assertEquals(2, formDtos.size());
 
         HistoryRateFormDto historyDto1 = formDtos.get(0);
-        assertEquals("25.06.2023", historyDto1.getDisplayRateDate());
-        assertEquals("1 btc = 27.974,17\u00a0€", historyDto1.getDisplayRate());
+        assertEquals("25.06.2023", historyDto1.getFormattedRateDate());
+        assertEquals("1 btc = 27.974,17\u00a0€", historyDto1.getFormattedRate());
 
         HistoryRateFormDto historyDto2 = formDtos.get(1);
-        assertEquals("26.06.2023", historyDto2.getDisplayRateDate());
-        assertEquals("100 btc = 0,00\u00a0€", historyDto2.getDisplayRate());
+        assertEquals("26.06.2023", historyDto2.getFormattedRateDate());
+        assertEquals("100 btc = 0,00\u00a0€", historyDto2.getFormattedRate());
     }
 }

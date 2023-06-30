@@ -19,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.*;
 
 import java.util.*;
 
@@ -119,8 +120,7 @@ public class CoinRateController {
      * @return A ResponseEntity containing the ChangeCoinResponseDto object.
      */
     @PostMapping(path = { "/change-ip", }, consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Object> changeIp(@RequestBody ChangeIpRequestDto changeIpRequestDto) {
-
+    public ResponseEntity<Object> changeIp(@Valid @RequestBody ChangeIpRequestDto changeIpRequestDto) {
         ChangeIpResponseDto responseDto = createChangeIpResponse(changeIpRequestDto.getCoinCode(),
                 changeIpRequestDto.getDaysCount(), changeIpRequestDto.getIpAddress());
         return ResponseEntity.ok(responseDto);

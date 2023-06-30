@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -21,13 +22,16 @@ public class CurrentRateFormDtoMapper {
      * Maps the microservice cryptocurrency current rate data to the CurrentRateFormDto object.
      *
      * @param currentRateDto        The client current rate.
+     * @param requestTime           The current rate requestTime.
      * @param currentRateDateFormat The date format for the current rate.
      * @param desiredPrecision      The desired precision for scaling the rate.
      * @param desiredScale          The desired scale for scaling the rate.
      * @param locale                The locale.
      * @return The mapped CurrentRateFormDto object.
      */
-    public static CurrentRateFormDto mapClientToFormDto(CurrentRateDto currentRateDto, String currentRateDateFormat,
+    public static CurrentRateFormDto mapClientToFormDto(CurrentRateDto currentRateDto,
+                                                        LocalDateTime requestTime,
+                                                        String currentRateDateFormat,
                                                         int desiredPrecision, int desiredScale, Locale locale) {
 
         BigDecimal rate = currentRateDto.getCurrentRate();
@@ -42,15 +46,16 @@ public class CurrentRateFormDtoMapper {
         if (currentRateDto.getRateDateTime() != null) {
 
             // Format the rate update date if available
-            String displayUpdateDateTime = dateFormatter.format(currentRateDto.getRateDateTime());
-            return new CurrentRateFormDto(displayRate, displayUpdateDateTime);
+            String formattedUpdateDateTime = dateFormatter.format(currentRateDto.getRateDateTime());
+            String formattedUpdateRequestDateTime = dateFormatter.format(requestTime);
+            return new CurrentRateFormDto(displayRate, formattedUpdateDateTime, formattedUpdateRequestDateTime);
         } else {
 
             logger.info("Rate time is not available for coin: " +
                     currentRateDto.getCoinCode() + " and currency: " + currentRateDto.getCurrencyCode());
 
             // If rate update date is not available, create CurrentRateFormDto with an empty update date
-            return new CurrentRateFormDto(displayRate, "");
+            return new CurrentRateFormDto(displayRate, "", "");
         }
     }
 }

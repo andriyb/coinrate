@@ -48,7 +48,7 @@ public class CoinRateServiceTest {
                 currentRateDto.getCurrencyCode(), germanLocale);
 
         assertNotNull(result);
-        assertEquals("10 btc = 1.234,50\u00a0€", result.getDisplayRate());
+        assertEquals("10 btc = 1.234,50\u00a0€", result.getFormattedRate());
     }
 
     @Test
@@ -65,7 +65,7 @@ public class CoinRateServiceTest {
         CurrentRateFormDto result = coinRateService.getCurrentRate(coinCode, currencyCode, germanLocale);
 
         assertNotNull(result);
-        assertNull(result.getDisplayRate());
+        assertNull(result.getFormattedRate());
     }
 
     @Test
@@ -89,7 +89,7 @@ public class CoinRateServiceTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("10 btc = 1.234,50\u00a0€", result.get(0).getDisplayRate());
+        assertEquals("10 btc = 1.234,50\u00a0€", result.get(0).getFormattedRate());
     }
 
     @Test
@@ -139,7 +139,7 @@ public class CoinRateServiceTest {
                 ipAddress, localeForm, historySettingsForm, germanLocale);
 
         assertNotNull(result);
-        assertEquals("10 btc = 1.234,50\u00a0€", result.getCurrentRateForm().getDisplayRate());
+        assertEquals("10 btc = 1.234,50\u00a0€", result.getCurrentRateForm().getFormattedRate());
     }
 
     @Test

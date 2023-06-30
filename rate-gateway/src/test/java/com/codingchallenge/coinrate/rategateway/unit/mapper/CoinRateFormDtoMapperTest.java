@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -46,7 +47,7 @@ class CoinRateFormDtoMapperTest {
 
         // Perform the mapping
         CoinRateFormDto result = CoinRateFormDtoMapper.mapClientToFormDto(formRateDto, supportedCoins, selectedCoin,
-                ipAddress, localeForm, historySettings, currentRateDateFormat, historyRateDateFormat,
+                ipAddress, localeForm, historySettings, LocalDateTime.now(), currentRateDateFormat, historyRateDateFormat,
                 desiredPrecision, desiredScale, locale);
 
         // Assert the mapping result
@@ -60,15 +61,15 @@ class CoinRateFormDtoMapperTest {
 
         // Assert the current rate
         CurrentRateFormDto currentRateForm = result.getCurrentRateForm();
-        Assertions.assertNotNull(currentRateForm.getDisplayRate());
-        Assertions.assertNotNull(currentRateForm.getDisplayUpdateDateTime());
+        Assertions.assertNotNull(currentRateForm.getFormattedRate());
+        Assertions.assertNotNull(currentRateForm.getFormattedUpdateDateTime());
 
         // Assert the history rates
         List<HistoryRateFormDto> historyRateForm = result.getHistoryRateForms();
         Assertions.assertEquals(3, historyRateForm.size());
         for (HistoryRateFormDto historyRate : historyRateForm) {
-            Assertions.assertNotNull(historyRate.getDisplayRate());
-            Assertions.assertNotNull(historyRate.getDisplayRateDate());
+            Assertions.assertNotNull(historyRate.getFormattedRate());
+            Assertions.assertNotNull(historyRate.getFormattedRateDate());
         }
     }
 
@@ -92,8 +93,8 @@ class CoinRateFormDtoMapperTest {
 
         // Perform the mapping
         CoinRateFormDto result = CoinRateFormDtoMapper.mapClientToFormDto(formRateDto, supportedCoins, selectedCoin,
-                ipAddress, localeForm, historySettings, currentRateDateFormat, historyRateDateFormat,
-                desiredPrecision, desiredScale, locale);
+                ipAddress, localeForm, historySettings, LocalDateTime.now(), currentRateDateFormat,
+                historyRateDateFormat, desiredPrecision, desiredScale, locale);
 
         // Assert the mapping result
         Assertions.assertEquals(supportedCoins, result.getSupportedCoins());
@@ -105,7 +106,7 @@ class CoinRateFormDtoMapperTest {
 
         // Assert the current rate
         CurrentRateFormDto currentRateForm = result.getCurrentRateForm();
-        Assertions.assertNotNull(currentRateForm.getDisplayRate());
-        Assertions.assertNotNull(currentRateForm.getDisplayUpdateDateTime());
+        Assertions.assertNotNull(currentRateForm.getFormattedRate());
+        Assertions.assertNotNull(currentRateForm.getFormattedUpdateDateTime());
     }
 }

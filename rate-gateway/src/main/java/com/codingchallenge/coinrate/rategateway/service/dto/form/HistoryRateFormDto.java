@@ -1,57 +1,57 @@
 package com.codingchallenge.coinrate.rategateway.service.dto.form;
 
 /**
- * Represents the display information for a historical rate.
+ * Represents the formatted information for a historical rate.
  */
 public class HistoryRateFormDto {
 
-    private String displayRateDate;
-    private String displayRate;
+    private String formattedRateDate;
+    private String formattedRate;
 
     /**
-     * Constructor for HistoryRateFormDto with display rate and rate date.
+     * Constructor for HistoryRateFormDto with formatted rate and rate date.
      *
-     * @param displayRate     The display rate to be set.
-     * @param displayRateDate The display rate date to be set.
+     * @param formattedRate     The formatted rate to be set.
+     * @param formattedRateDate The formatted rate date to be set.
      */
-    public HistoryRateFormDto(String displayRate, String displayRateDate) {
-        this.displayRate = displayRate;
-        this.displayRateDate = displayRateDate;
+    public HistoryRateFormDto(String formattedRate, String formattedRateDate) {
+        this.formattedRate = formattedRate;
+        this.formattedRateDate = formattedRateDate;
     }
 
     /**
-     * Gets the display rate date.
+     * Gets the formatted rate date.
      *
-     * @return The display rate date.
+     * @return The formatted rate date.
      */
-    public String getDisplayRateDate() {
-        return displayRateDate;
+    public String getFormattedRateDate() {
+        return formattedRateDate;
     }
 
     /**
-     * Sets the display rate date.
+     * Sets the formatted rate date.
      *
-     * @param displayRateDate The display rate date to be set.
+     * @param formattedRateDate The formatted rate date to be set.
      */
-     public void setDisplayRateDate(String displayRateDate) {
-        this.displayRateDate = displayRateDate;
+     public void setFormattedRateDate(String formattedRateDate) {
+        this.formattedRateDate = formattedRateDate;
     }
 
     /**
-     * Gets the display rate.
+     * Gets the formatted rate.
      *
-     * @return The display rate.
+     * @return The formatted rate.
      */
-    public String getDisplayRate() {
-        return displayRate;
+    public String getFormattedRate() {
+        return formattedRate;
     }
 
     /**
-     * Sets the display rate.
+     * Sets the formatted rate.
      *
-     * @param displayRate The display rate to be set.
+     * @param formattedRate The formatted rate to be set.
      */
-    public void setDisplayRate(String displayRate) {
-        this.displayRate = displayRate;
+    public void setFormattedRate(String formattedRate) {
+        this.formattedRate = formattedRate;
     }
 }
