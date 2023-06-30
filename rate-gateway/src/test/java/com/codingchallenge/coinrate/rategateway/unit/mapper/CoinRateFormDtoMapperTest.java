@@ -68,8 +68,8 @@ class CoinRateFormDtoMapperTest {
         List<HistoryRateFormDto> historyRateForm = result.getHistoryRateForms();
         Assertions.assertEquals(3, historyRateForm.size());
         for (HistoryRateFormDto historyRate : historyRateForm) {
-            Assertions.assertNotNull(historyRate.getDisplayRate());
-            Assertions.assertNotNull(historyRate.getDisplayRateDate());
+            Assertions.assertNotNull(historyRate.getFormattedRate());
+            Assertions.assertNotNull(historyRate.getFormattedRateDate());
         }
     }
 

@@ -64,7 +64,7 @@
 
                 let valueLabel = document.createElement('label');
                 valueLabel.setAttribute('class', 'input-group-text label-min-width');
-                valueLabel.textContent = historyRates[i].displayRateDate;
+                valueLabel.textContent = historyRates[i].formattedRateDate;
 
                 valueCell.appendChild(valueLabel);
 
@@ -73,7 +73,7 @@
                 let dateCell = document.createElement('div');
                 dateCell.setAttribute('type', 'text');
                 dateCell.setAttribute('class', 'form-control text-start');
-                dateCell.textContent = historyRates[i].displayRate;
+                dateCell.textContent = historyRates[i].formattedRate;
 
                 divElement.appendChild(dateCell);
 
@@ -139,9 +139,9 @@
                 if (xhr.status === 200) {
 
                     let response = JSON.parse(xhr.responseText);
-                    document.getElementById("current-rate-input").innerHTML = response.rateForm.displayRate;
-                    document.getElementById("update-time-input").innerHTML = response.rateForm.displayUpdateDateTime;
-
+                    document.getElementById("current-rate-input").innerHTML = response.rateForm.formattedRate;
+                    document.getElementById("update-time-input").innerHTML = response.rateForm.formattedUpdateDateTime;
+                    document.getElementById("update-request-time-input").innerHTML = response.rateForm.formattedUpdateRequestDateTime;
 
                     let tbodyElement = document.getElementById('history-table-body');
                     tbodyElement.innerHTML = '';
@@ -193,8 +193,9 @@
                             document.getElementById("ip-status-input").innerHTML = "Locale detected successfully.";
                         }
 
-                        document.getElementById("current-rate-input").innerHTML= response.rateForm.displayRate;
-                        document.getElementById("update-time-input").innerHTML = response.rateForm.displayUpdateDateTime;
+                        document.getElementById("current-rate-input").innerHTML= response.rateForm.formattedRate;
+                        document.getElementById("update-time-input").innerHTML = response.rateForm.formattedUpdateDateTime;
+                        document.getElementById("update-request-time-input").innerHTML = response.rateForm.formattedUpdateRequestDateTime;
 
 
                         let tbodyElement = document.getElementById('history-table-body');
@@ -236,8 +237,9 @@
             xhr.onload = function () {
                 if (xhr.status === 200) {
                     let response = JSON.parse(xhr.responseText);
-                    document.getElementById("current-rate-input").value = response.displayRate;
-                    document.getElementById("update-time-input").value = response.displayUpdateDateTime;
+                    document.getElementById("current-rate-input").value = response.formattedRate;
+                    document.getElementById("update-time-input").value = response.formattedUpdateDateTime;
+                    document.getElementById("update-request-time-input").innerHTML = response.formattedUpdateRequestDateTime;
                 } else {
                     // Handle error cases
                     console.log("Error: " + xhr.status);
@@ -349,6 +351,14 @@
                         </div>
                         <div class="input-group mb-2">
                             <div class="input-group-prepend">
+                                <label class="input-group-text label-min-width" for="update-request-time-input">Current Rate Request Time</label>
+                            </div>
+                            <div id="update-request-time-input" class="input-group-text"
+                                 th:text="${pageForm.currentRateForm.formattedUpdateRequestDateTime}">
+                            </div>
+                        </div>
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
                                 <label class="input-group-text label-min-width" for="update-time-input">Current Rate Update Time</label>
                             </div>
                             <div id="update-time-input" class="input-group-text"
@@ -372,9 +382,9 @@
                             <div th:each="data : ${pageForm.historyRateForms}">
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text label-min-width" for="currency-input" th:text="${data.displayRateDate}"></label>
+                                        <label class="input-group-text label-min-width" for="currency-input" th:text="${data.formattedRateDate}"></label>
                                     </div>
-                                    <div class="input-group-text" th:text="${data.displayRate}"></div>
+                                    <div class="input-group-text" th:text="${data.formattedRate}"></div>
                                 </div>
                             </div>
                         </div>

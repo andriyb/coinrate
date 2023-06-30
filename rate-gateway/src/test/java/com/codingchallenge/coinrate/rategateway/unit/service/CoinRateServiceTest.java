@@ -89,7 +89,7 @@ public class CoinRateServiceTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("10 btc = 1.234,50\u00a0€", result.get(0).getDisplayRate());
+        assertEquals("10 btc = 1.234,50\u00a0€", result.get(0).getFormattedRate());
     }
 
     @Test
