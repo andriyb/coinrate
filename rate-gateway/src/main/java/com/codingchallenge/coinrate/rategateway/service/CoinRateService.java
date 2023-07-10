@@ -3,11 +3,13 @@ package com.codingchallenge.coinrate.rategateway.service;
 import com.codingchallenge.coinrate.rategateway.client.CurrencyServiceClient;
 import com.codingchallenge.coinrate.rategateway.client.dto.*;
 import com.codingchallenge.coinrate.rategateway.service.dto.form.*;
+import com.codingchallenge.coinrate.rategateway.service.exception.CurrencyServiceNotAvailableException;
 import com.codingchallenge.coinrate.rategateway.service.mapper.CurrentRateFormDtoMapper;
 import com.codingchallenge.coinrate.rategateway.service.mapper.HistoryRateFormDtoMapper;
 import com.codingchallenge.coinrate.rategateway.service.mapper.HistorySettingsFormDtoMapper;
 import com.codingchallenge.coinrate.rategateway.service.mapper.CoinRateFormDtoMapper;
 
+import feign.FeignException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,22 +58,29 @@ public class CoinRateService {
      * @param currencyCode The code of the currency.
      * @return The current rate.
      */
-    public CurrentRateFormDto getCurrentRate(String coinCode, String currencyCode, Locale locale) {
+    public CurrentRateFormDto getCurrentRate(String coinCode, String currencyCode, Locale locale)
+                                            throws CurrencyServiceNotAvailableException {
 
         CurrentRateFormDto defaultCurrentRateForm = new CurrentRateFormDto();
 
-        // Call the currency service client to get the current rate
-        ResponseEntity<CurrentRateDto> responseEntity =
-                currencyServiceClient.getCurrentRate(coinCode, currencyCode.toLowerCase());
+        try {
+            // Call the currency service client to get the current rate
+            ResponseEntity<CurrentRateDto> responseEntity =
+                    currencyServiceClient.getCurrentRate(coinCode, currencyCode.toLowerCase());
 
-        if (responseEntity != null &&
-                HttpStatus.OK.equals(responseEntity.getStatusCode())) {
-            CurrentRateDto currentRateDto = responseEntity.getBody();
+            if (responseEntity != null &&
+                    HttpStatus.OK.equals(responseEntity.getStatusCode())) {
+                CurrentRateDto currentRateDto = responseEntity.getBody();
 
-            if (currentRateDto != null) {
-                return CurrentRateFormDtoMapper.mapClientToFormDto(currentRateDto, LocalDateTime.now(),
-                        currentRateDateFormat, scaledRatePrecision, scaledRateScale, locale);
+                if (currentRateDto != null) {
+                    return CurrentRateFormDtoMapper.mapClientToFormDto(currentRateDto, LocalDateTime.now(),
+                            currentRateDateFormat, scaledRatePrecision, scaledRateScale, locale);
+                }
             }
+        } catch (FeignException e) {
+
+            logger.error("Feign Client exception while loading current rate.", e);
+            throw new CurrencyServiceNotAvailableException(e);
         }
         return defaultCurrentRateForm;
     }
@@ -84,21 +93,27 @@ public class CoinRateService {
      * @param daysCount    The number of days for the rate history.
      * @return The rate history.
      */
-    public List<HistoryRateFormDto> getRateHistory(String coinCode, String currencyCode,
-                                                   Integer daysCount, Locale locale) {
+    public List<HistoryRateFormDto> getRateHistory(String coinCode, String currencyCode, Integer daysCount,
+                                                   Locale locale) throws CurrencyServiceNotAvailableException  {
 
-        // Call the currency service client to get the rate history
-        ResponseEntity<List<HistoryRateDto>> responseEntity =
-                currencyServiceClient.getRateHistory(coinCode, currencyCode.toLowerCase(), daysCount);
+        try {
+            // Call the currency service client to get the rate history
+            ResponseEntity<List<HistoryRateDto>> responseEntity =
+                    currencyServiceClient.getRateHistory(coinCode, currencyCode.toLowerCase(), daysCount);
 
-        if (responseEntity != null &&
-                HttpStatus.OK.equals(responseEntity.getStatusCode())) {
-            List<HistoryRateDto> historyRates = responseEntity.getBody();
+            if (responseEntity != null &&
+                    HttpStatus.OK.equals(responseEntity.getStatusCode())) {
+                List<HistoryRateDto> historyRates = responseEntity.getBody();
 
-            if (historyRates != null) {
-                return HistoryRateFormDtoMapper.mapClientToFormDto(historyRates, historyRateDateFormat,
-                        scaledRatePrecision, scaledRateScale, locale);
+                if (historyRates != null) {
+                    return HistoryRateFormDtoMapper.mapClientToFormDto(historyRates, historyRateDateFormat,
+                            scaledRatePrecision, scaledRateScale, locale);
+                }
             }
+        } catch (FeignException e) {
+
+            logger.error("Feign Client exception while loading rate history.", e);
+            throw new CurrencyServiceNotAvailableException(e);
         }
         return List.of();
     }
@@ -114,30 +129,37 @@ public class CoinRateService {
     public CoinRateFormDto getFormRate(String coinCode, String currencyCode, Integer daysCount,
                                        List<String> supportedCoins, String ipAddress, LocaleFormDto localeForm,
                                        HistorySettingsFormDto historySettingsForm,
-                                       Locale locale) {
+                                       Locale locale) throws CurrencyServiceNotAvailableException  {
 
         CoinRateFormDto rateForm = new CoinRateFormDto();
 
-        // Call the currency service client to get the form rate
-        ResponseEntity<FormRateDto> responseEntity =
-                currencyServiceClient.getFormRate(coinCode, currencyCode, daysCount);
 
-        if (responseEntity != null &&
-                HttpStatus.OK.equals(responseEntity.getStatusCode())) {
+        try {
+            // Call the currency service client to get the form rate
+            ResponseEntity<FormRateDto> responseEntity =
+                    currencyServiceClient.getFormRate(coinCode, currencyCode, daysCount);
 
-            FormRateDto formRateDto = responseEntity.getBody();
-            if (formRateDto != null) {
-                return CoinRateFormDtoMapper.mapClientToFormDto(formRateDto, supportedCoins, coinCode, ipAddress,
-                        localeForm, historySettingsForm, LocalDateTime.now(),
-                        currentRateDateFormat, historyRateDateFormat,
-                        scaledRatePrecision, scaledRateScale, locale);
+            if (responseEntity != null &&
+                    HttpStatus.OK.equals(responseEntity.getStatusCode())) {
+
+                FormRateDto formRateDto = responseEntity.getBody();
+                if (formRateDto != null) {
+                    return CoinRateFormDtoMapper.mapClientToFormDto(formRateDto, supportedCoins, coinCode, ipAddress,
+                            localeForm, historySettingsForm, LocalDateTime.now(),
+                            currentRateDateFormat, historyRateDateFormat,
+                            scaledRatePrecision, scaledRateScale, locale);
+                } else {
+                    logger.info("FormRateDto from currencyServiceClient.getFormRate(coinCode, currencyCode, daysCount) " +
+                            "is null. CoinCode=" + coinCode + ", currencyCode=" + currencyCode);
+                }
             } else {
-                logger.info("FormRateDto from currencyServiceClient.getFormRate(coinCode, currencyCode, daysCount) " +
-                        "is null. CoinCode=" + coinCode + ", currencyCode=" + currencyCode);
+                logger.info("ResponseEntity from currencyServiceClient.getFormRate(coinCode, currencyCode, daysCount) " +
+                        " is null or not OK for CoinCode=" + coinCode + ", currencyCode=" + currencyCode);
             }
-        }else {
-            logger.info("ResponseEntity from currencyServiceClient.getFormRate(coinCode, currencyCode, daysCount) " +
-                    " is null or not OK for CoinCode=" + coinCode + ", currencyCode=" + currencyCode);
+        }  catch (FeignException e) {
+
+            logger.error("Feign Client exception while loading form rate data.", e);
+            throw new CurrencyServiceNotAvailableException(e);
         }
 
         return rateForm;
@@ -148,7 +170,7 @@ public class CoinRateService {
      *
      * @return The list of supported coins.
      */
-    public List<String> getSupportedCoins() {
+    public List<String> getSupportedCoins() throws CurrencyServiceNotAvailableException  {
 
         // Call the currency service client to get the supported coins
         ResponseEntity<List<CoinList>> responseEntity = currencyServiceClient.getSupportedCoins();
@@ -166,7 +188,7 @@ public class CoinRateService {
         return List.of();
     }
 
-    public HistorySettingsFormDto getHistorySettings() {
+    public HistorySettingsFormDto getHistorySettings() throws CurrencyServiceNotAvailableException  {
 
         HistorySettingsFormDto defaultHistorySettingsForm =
                 new HistorySettingsFormDto(1,1);

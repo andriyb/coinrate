@@ -12,20 +12,15 @@
             font-size: 20px;
         }
 
+        .bootstrap-select .btn {
+            padding: 5px 12px;
+            background-color: white;
+        }
+
         h2 {
             font-size: 18px;
         }
 
-        .label-min-width {
-            min-width: 220px;
-        }
-
-        #ip-address-tooltip {
-            margin-left: 220px;
-            width: 216px;
-            border-top-right-radius: var(--bs-border-radius);
-            border-bottom-right-radius: var(--bs-border-radius);
-        }
 
         #history-table td:first-child {
             min-width: 120px;
@@ -51,19 +46,19 @@
 
         function setNormalBorder() {
             let ipInput = document.getElementById("ip-address-input")
-            ipInput.setAttribute("class", "form-control");
+            ipInput.setAttribute("class", "form-control  border rounded-0");
         }
 
         function buildTable(historyRates, tbodyElement) {
             for (let i = 0; i < historyRates.length; i++) {
                 let divElement = document.createElement('div');
-                divElement.setAttribute('class', 'input-group mb-2');
+                divElement.setAttribute('class', 'input-group mb-2 row ms-0');
 
                 let valueCell = document.createElement('div');
-                valueCell.setAttribute('class', 'input-group-prepend');
+                valueCell.setAttribute('class', 'input-group-prepend border rounded-start col-4 p-0');
 
                 let valueLabel = document.createElement('label');
-                valueLabel.setAttribute('class', 'input-group-text label-min-width');
+                valueLabel.setAttribute('class', 'input-group-text border-0');
                 valueLabel.textContent = historyRates[i].formattedRateDate;
 
                 valueCell.appendChild(valueLabel);
@@ -203,10 +198,10 @@
                         let historyRates = response.historyRatesForm;
 
                         buildTable(historyRates, tbodyElement);
-                        ipInput.setAttribute("class", "form-control");
+                        ipInput.setAttribute("class", "form-control border rounded-0");
 
                     } else {
-                        ipInput.setAttribute("class", "form-control is-invalid");
+                        ipInput.setAttribute("class", "form-control border rounded-0 is-invalid");
                         ipInput.focus();
                         // Handle error cases
                         console.log("Error: " + xhr.status);
@@ -215,7 +210,7 @@
                 xhr.send(JSON.stringify(params));
             }
             else {
-                ipInput.setAttribute("class", "form-control is-invalid");
+                ipInput.setAttribute("class", "form-control border rounded-0 is-invalid");
                 ipInput.focus();
                 console.log("Error: Invalid IP");
             }
@@ -293,83 +288,84 @@
     <div sec:authorize="isAuthenticated()">
         <div id="page-content">
             <div class="container d-flex justify-content-center align-items-center">
-                <div class="border border-secondary p-3 rounded">
+                <div class="border border-secondary p-3 rounded w-50">
                     <form id="coin-rates-form" th:object="${pageForm}">
                         <input type="hidden" name="token" th:value="${pageForm.token}"/>
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text label-min-width" for="coins-dropdown">Crypto Currency:</label>
+                        <div class="input-group mb-2 row ms-0">
+                            <div class="input-group-prepend border rounded-start col-4 p-0">
+                                <label class="input-group-text border-0" for="coins-dropdown">Crypto Currency</label>
                             </div>
-                            <select id="coins-dropdown" name="coins-dropdown" class="selectpicker form-control" data-live-search="true"
+                            <select id="coins-dropdown" name="coins-dropdown" class="selectpicker form-control col-8 border" data-live-search="true"
                                     th:field="${pageForm.selectedCoin}" onchange="sendChangeCoinRequest();" required>
                                 <option th:each="option : ${pageForm.supportedCoins}" th:value="${option}"
                                         th:text="${option}"></option>
                             </select>
                         </div>
-                        <div class="mb-2 position-relative">
-                            <div class="input-group">
-                                <label class="input-group-text label-min-width" for="ip-address-input">IP address (optional):</label>
-                                <input id="ip-address-input" type="text" class="form-control" onblur="setNormalBorder()"
-                                   pattern="^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^((([0-9a-fA-F]{1,4}:){0,5})?([0-9a-fA-F]{1,4})?::(([0-9a-fA-F]{1,4}:){0,5})?[0-9a-fA-F]{1,4})$|^((([0-9]{1,3}\.){3}[0-9]{1,3}))$"
-                                   th:field="*{ipAddress}" required >
-                                <div id="ip-address-tooltip" class="invalid-tooltip">
+                        <div class="input-group mb-2 row ms-0">
+                            <div class="input-group-prepend border rounded-start col-4 p-0">
+                                <label class="input-group-text border-0" for="ip-address-input">IP address (optional)</label>
+                            </div>
+                            <div class="input-group col p-0">
+                                <input id="ip-address-input" type="text" class="form-control border rounded-0" onblur="setNormalBorder()"
+                                       pattern="^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^((([0-9a-fA-F]{1,4}:){0,5})?([0-9a-fA-F]{1,4})?::(([0-9a-fA-F]{1,4}:){0,5})?[0-9a-fA-F]{1,4})$|^((([0-9]{1,3}\.){3}[0-9]{1,3}))$"
+                                       th:field="*{ipAddress}" required >
+                                <div id="ip-address-tooltip" class="invalid-tooltip rounded-end w-100">
                                     IP Address is not valid.
                                 </div>
-                                <button class="btn btn-outline-secondary" type="button" onclick="sendDetectIpRequest();">Detect</button>
-                                <button class="btn btn-outline-secondary" type="button" onclick="sendChangeIpRequest();">Apply</button>
                             </div>
+                            <button class="btn btn-outline-secondary border col-2" type="button" onclick="sendDetectIpRequest();">Detect</button>
+                            <button class="btn btn-outline-secondary border col-2" type="button" onclick="sendChangeIpRequest();">Apply</button>
                         </div>
-                        <div class="input-group mb-2">
-                            <div class="input-group">
-                                <label class="input-group-text label-min-width" for="ip-status-input">Locale settings status</label>
-
-                            <div id="ip-status-input" class="input-group-text"
+                        <div class="input-group mb-2 row ms-0">
+                            <div class="input-group-prepend border rounded-start col-4 p-0">
+                                <label class="input-group-text border-0" for="ip-status-input">Locale settings status</label>
+                            </div>
+                            <div id="ip-status-input" class="input-group-text col"
                                  th:text="${pageForm.localeForm.localeNotFound} ? 'IP Address is not found, using default settings.' : 'Locale detected successfully.'">
                             </div>
-                            </div>
                         </div>
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text label-min-width" for="country-input">Country By IP</label>
+                        <div class="input-group mb-2 row ms-0">
+                            <div class="input-group-prepend border rounded-start col-4 p-0">
+                                <label class="input-group-text border-0" for="country-input">Country By IP</label>
                             </div>
-                            <div id="country-input" class="input-group-text"
+                            <div id="country-input" class="input-group-text col"
                                  th:text="${pageForm.localeForm.country}">
                             </div>
                         </div>
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text label-min-width" for="currency-input">Local Currency</label>
+                        <div class="input-group mb-2 row ms-0">
+                            <div class="input-group-prepend border rounded-start col-4 p-0">
+                                <label class="input-group-text border-0" for="currency-input">Local Currency</label>
                             </div>
-                            <div id="currency-input"  class="input-group-text" th:text="${pageForm.localeForm.currency}"></div>
+                            <div id="currency-input"  class="input-group-text col" th:text="${pageForm.localeForm.currency}"></div>
                         </div>
-                        <div class="mb-2 position-relative">
-                            <div class="input-group">
-                                <label class="input-group-text label-min-width" for="current-rate-input">Current Rate</label>
-                                <span id="current-rate-input" class="input-group-text" th:text="${pageForm.currentRateForm.formattedRate}"></span>
-                                <button class="btn btn-outline-secondary" type="button" onclick="sendUpdateCurrentRateRequest();">Update</button>
+                        <div class="input-group mb-2 row ms-0">
+                            <div class="input-group-prepend border rounded-start col-4 p-0">
+                                <label class="input-group-text border-0" for="current-rate-input">Current Rate</label>
                             </div>
+                            <span id="current-rate-input" class="input-group-text col" th:text="${pageForm.currentRateForm.formattedRate}"></span>
+                            <button class="btn btn-outline-secondary col-2" type="button" onclick="sendUpdateCurrentRateRequest();">Update</button>
                         </div>
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text label-min-width" for="update-request-time-input">Current Rate Request Time</label>
+                        <div class="input-group mb-2 row ms-0">
+                            <div class="input-group-prepend border rounded-start col-4 p-0">
+                                <label class="input-group-text border-0" for="update-request-time-input">Rate Request Time</label>
                             </div>
-                            <div id="update-request-time-input" class="input-group-text"
+                            <div id="update-request-time-input" class="input-group-text col"
                                  th:text="${pageForm.currentRateForm.formattedUpdateRequestDateTime}">
                             </div>
                         </div>
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text label-min-width" for="update-time-input">Current Rate Update Time</label>
+                        <div class="input-group mb-2 row ms-0">
+                            <div class="input-group-prepend border rounded-start col-4 p-0">
+                                <label class="input-group-text border-0" for="update-time-input">Rate Update Time</label>
                             </div>
-                            <div id="update-time-input" class="input-group-text"
-                                   th:text="${pageForm.currentRateForm.formattedUpdateDateTime}">
+                            <div id="update-time-input" class="input-group-text col"
+                                 th:text="${pageForm.currentRateForm.formattedUpdateDateTime}">
                             </div>
                         </div>
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text label-min-width" for="input-days-count">Rates History Length</label>
+                        <div class="input-group mb-2 row ms-0">
+                            <div class="input-group-prepend border rounded-start col-4 p-0">
+                                <label class="input-group-text border-0" for="input-days-count">Rates History Length</label>
                             </div>
-                            <select class="form-select" id="input-days-count" onchange="sendChangeDaysCountRequest();">
+                            <select class="form-select col" id="input-days-count" onchange="sendChangeDaysCountRequest();">
                                 <option th:each="i : ${#numbers.sequence(1, pageForm.historySettings.historyDaysCountLimit)}" th:value="${i}" th:text="${i} + ' Day' + (${i>1}? 's':'') "
                                         th:selected="${i==pageForm.historySettings.historyDaysCountDefault}"></option>
                             </select>
@@ -380,11 +376,11 @@
                     <div class="row">
                         <div id="history-table-body" class="col">
                             <div th:each="data : ${pageForm.historyRateForms}">
-                                <div class="input-group mb-2">
-                                    <div class="input-group-prepend">
-                                        <label class="input-group-text label-min-width" for="currency-input" th:text="${data.formattedRateDate}"></label>
+                                <div class="input-group mb-2 row ms-0">
+                                    <div class="input-group-prepend border rounded-start col-4 p-0">
+                                        <label class="input-group-text border-0" for="currency-input" th:text="${data.formattedRateDate}"></label>
                                     </div>
-                                    <div class="input-group-text" th:text="${data.formattedRate}"></div>
+                                    <div class="input-group-text col" th:text="${data.formattedRate}"></div>
                                 </div>
                             </div>
                         </div>
